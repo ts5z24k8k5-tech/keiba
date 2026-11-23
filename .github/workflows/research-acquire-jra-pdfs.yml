@@ -17,6 +17,15 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.11'
+      - name: Require private repository before handling PDFs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          visibility="$(gh api "repos/${GITHUB_REPOSITORY}" --jq .visibility)"
+          if [ "$visibility" != "private" ]; then
+            echo "::error::This workflow handles source PDFs and must not publish artifacts from a public repository. Make the repository private first."
+            exit 1
+          fi
       - name: Restore private manifest from Actions secret
         env:
           MANIFEST_B64: ${{ secrets.JRA_PDF_MANIFEST_B64 }}
@@ -39,7 +48,7 @@ jobs:
         if: success()
         run: python scripts/inspect_jra_pdf_layout.py --pdf-dir output/jra_pdfs --out output/jra_pdfs/layout_audit.json
       - name: Publish acquisition artifact only
-        if: always()
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: jra-official-pdfs-acquisition
