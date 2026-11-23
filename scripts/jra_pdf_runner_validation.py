@@ -36,7 +36,7 @@ def validate_runner_candidates(candidates: Iterable[RunnerCandidate], *, race_id
     as raw status and may have a rank only when explicitly supplied.
     """
     rows = list(candidates)
-    if not re.fullmatch(r"20\\d{10}", race_id):
+    if not re.fullmatch(r"20\d{10}", race_id):
         raise RunnerValidationError("race_id must be a 12-digit target ID")
     if declared_field_size < 1 or declared_field_size > 18:
         raise RunnerValidationError("declared field size must be between 1 and 18")
@@ -69,6 +69,6 @@ def validate_runner_candidates(candidates: Iterable[RunnerCandidate], *, race_id
             raise RunnerValidationError(f"non-finisher/disqualified horse_no {row.horse_no} cannot have numeric finish_rank")
         if status and not row.finish_raw.strip():
             raise RunnerValidationError(f"raw finish text is required when result_status is set for horse_no {row.horse_no}")
-        if row.horse_id is not None and not re.fullmatch(r"\\d{10}", row.horse_id):
+        if row.horse_id is not None and not re.fullmatch(r"\d{10}", row.horse_id):
             raise RunnerValidationError(f"horse_id must be an exact 10-digit ID or null for horse_no {row.horse_no}")
     return sorted(rows, key=lambda row: row.horse_no)
