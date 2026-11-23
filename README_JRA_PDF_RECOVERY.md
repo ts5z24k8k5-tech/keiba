@@ -51,5 +51,6 @@ runner rows, resolve horse IDs, or write to SQLite.
 
 See `docs/JRA_PDF_PARSER_ACCEPTANCE.md` for runner-field provenance,
 non-finisher handling, staging requirements and the acceptance gates before
-any database promotion. The PR test workflow runs both downloader and
-segmentation unit tests on updates to this isolated research branch.
+any database promotion. The PR test workflow runs downloader, race-segmentation, and coordinate-geometry
+unit tests on updates to this isolated research branch. Coordinate grouping is
+currently validated only with synthetic fixtures, not real JRA PDF binaries.
