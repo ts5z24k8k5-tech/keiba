@@ -94,7 +94,7 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
     def test_rejects_duplicate_manifest_paths(self):
         entry = {
             "path": "scripts/example.py", "source_git_blob_sha1": "b" * 40,
-            "source_bytes": len(self.body), "export": True, "expected_sha256": self.digest,
+            "source_bytes": len(self.body), "status": "ALLOW_CANDIDATE", "export": True, "expected_sha256": self.digest,
         }
         self.write_manifest([entry, entry])
         with self.assertRaisesRegex(ValueError, "duplicate manifest path"):
@@ -103,10 +103,20 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
     def test_rejects_manifest_path_traversal(self):
         entry = {
             "path": "../outside.py", "source_git_blob_sha1": "b" * 40,
-            "source_bytes": 1, "export": True, "expected_sha256": self.digest,
+            "source_bytes": 1, "status": "ALLOW_CANDIDATE", "export": True, "expected_sha256": self.digest,
         }
         self.write_manifest([entry])
         with self.assertRaisesRegex(ValueError, "unsafe"):
+            self.result()
+
+    def test_rejects_rewrite_required_entry_even_if_export_flag_is_set(self):
+        entry = {
+            "path": "scripts/example.py", "source_git_blob_sha1": "b" * 40,
+            "source_bytes": len(self.body), "status": "REWRITE_REQUIRED",
+            "export": True, "expected_sha256": self.digest,
+        }
+        self.write_manifest([entry])
+        with self.assertRaisesRegex(ValueError, "cannot be exported"):
             self.result()
 
     def test_rejects_windows_drive_and_case_colliding_paths(self):
@@ -148,7 +158,7 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
             "source_bytes": len(self.body), "export": True, "expected_sha256": self.digest,
         }, {
             "path": "docs/extra.json", "source_git_blob_sha1": "c" * 40,
-            "source_bytes": len(body), "export": True,
+            "source_bytes": len(body), "status": "ALLOW_CANDIDATE", "export": True,
             "expected_sha256": hashlib.sha256(body).hexdigest(),
         }]
         self.write_manifest(entries)
