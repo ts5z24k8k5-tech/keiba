@@ -36,7 +36,7 @@ jobs:
           set -o pipefail
           python -u scripts/build_dataset.py 2>&1 | tee output/fetch_log.txt
 
-      - name: Publish database and audit even if quality checks fail
+      - name: Publish database and audit after successful checks
         if: success()
         uses: actions/upload-artifact@v4
         with:
