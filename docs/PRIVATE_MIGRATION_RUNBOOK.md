@@ -149,3 +149,40 @@ Repository secrets, variables, environments, permissions, and workflow settings 
 - GitHub: [Setting repository visibility](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility)
 - GitHub: [Downloading workflow artifacts](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts)
 - GitHub: [Planning your migration to GitHub](https://docs.github.com/en/migrations/overview/planning-your-migration-to-github)
+
+
+## Live preflight correction — 2026-11-23 16:27 JST
+
+This addendum supersedes any earlier branch-head, PR-size, and Actions-run-count snapshot above. GitHub was queried again immediately before this update.
+
+- Current `main`: `6ec783499b8e3b77274e59fb251936d90a231d8d` (unchanged).
+- Current research branch: `277e4ce4da644067e29f56788021a4d358de55db`.
+- PR #1: Open, Draft, unmerged; base `main`; head research branch; 141 commits, 47 changed files, +4,603 / -16.
+- PR #1 currently has zero issue comments and zero submitted reviews in the queried endpoints. This does not mean its PR metadata or check history can be recreated by a Git mirror.
+- The source repository currently reports 702 KB, public, fork=true, zero child forks, and parent `yuhevita-wq/keiba`.
+- Main commit listing currently returns 38 commits. The research branch contains 141 commits in the PR comparison. The PR commit endpoint returned 100 on page 1 and 41 on page 2.
+- Actions API currently reports 212 workflow runs across three pages: 208 `Research PDF downloader tests`, 3 `.github/workflows/research-acquire-jra-pdfs.yml`, and 1 `.github/workflows/research-pdf-tests.yml`. Conclusions: 142 success, 70 failure. No historical-data collection or odds-capture run appeared in these returned records.
+- Latest PR run inspected: `45131277893`, job `unit-tests` succeeded; its artifact list was empty.
+- Current main workflow files were fetched directly and confirmed unsafe for a public repository: `collect-jra.yml` remains manually dispatchable and uploads SQLite/training CSV/audit/log outputs with `if: always()`; `fetch-current-odds.yml` still has a selected-path push trigger, `contents: write`, `if: always()` artifact upload, and commit/push attempts. Do not run these workflows in the public fork.
+- The run counts above are the current API listing, not a guarantee that expired/deleted artifacts or older records never existed.
+
+### Migration inventory and stop conditions — refined
+
+Treat these as separate migration classes; do not indiscriminately copy all files into the private repository:
+
+1. **Git refs/history:** mirror all branches and tags to an empty private destination only after local mirror backup and verification. The public history already contains model probabilities, market snapshots, evaluation outputs, and the 1,554-row candidate-ticket CSV. Mirroring preserves that exposure in history; it does not undo public disclosure.
+2. **PR metadata:** preserve old public PR #1 by leaving the source fork untouched. Create a new private Draft PR only after mirror verification; link back to public PR #1. Do not promise comment/review/check migration.
+3. **Actions configuration:** workflow YAML files are Git content and will be mirrored. GitHub Actions enablement, repository secrets, variables, environments, permissions, branch rules, and artifacts are not Git refs and must be handled separately. Keep Actions disabled in the destination before the mirror push and during initial validation because the mirrored `main` contains a push-triggered workflow with write permission.
+4. **Private research inputs:** keep manifest CSVs, local source PDFs, SQLite databases, training/validation/test datasets, model binaries, odds snapshots not intended for publication, raw logs, and credentials outside Git history. Use a separately controlled private storage/backup path and transfer only after the destination's Private visibility is independently confirmed.
+5. **Publicly exposed material:** do not treat migration as remediation. If any credential is found in any historical commit, revoke/rotate it first; history rewriting or deleting the current file is not sufficient to invalidate an exposed credential.
+
+### Required pre-migration freeze snapshot
+
+Immediately before any future migration, re-query and record:
+- repository `private`, `fork`, parent, size, and child-fork count;
+- all branch names and exact SHAs; all tags;
+- PR #1 state, draft flag, base/head refs and SHAs, commit count, changed files, comments/reviews;
+- Actions run inventory and currently retained artifacts;
+- source tree and workflow file hashes.
+
+Do not reuse the SHA values in this addendum blindly if the research branch advances again. This addendum is an audit record, not permission to create a destination or push refs.
