@@ -13,7 +13,7 @@ from scripts.jra_pdf_columns import (
 class ExplicitColumnAssignmentTests(unittest.TestCase):
     def setUp(self):
         self.bands = [
-            ColumnBand("horse_no", 0, 30),
+            ColumnBand("horse_no", 0, 20),
             ColumnBand("horse_name", 30, 160),
             ColumnBand("jockey", 160, 240),
         ]
