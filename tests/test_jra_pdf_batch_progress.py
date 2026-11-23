@@ -52,7 +52,18 @@ class PdfBatchProgressTests(unittest.TestCase):
                 ["202410010101"], [PdfBatch("pdf-a", ("202410010101",), "acquired", 0)]
             )
 
-    def test_acquired_requires_valid_sha256_and_size(self):\n        for changes in ({"sha256": "bad", "byte_count": 2048}, {"sha256": "b" * 64, "byte_count": 100}):\n            with self.subTest(changes=changes), self.assertRaises(PdfBatchProgressError):\n                build_pdf_batch_summary(["202410010101"], [PdfBatch("pdf-a", ("202410010101",), "acquired", 1, **changes)])\n\n    def test_successful_batch_serializes_integrity_metadata(self):\n        summary = build_pdf_batch_summary(["202410010101"], [PdfBatch("pdf-a", ("202410010101",), "acquired", 1, sha256="c" * 64, byte_count=2048)])\n        item = pdf_batch_summary_to_dict(summary)["batches"][0]\n        self.assertEqual(item["sha256"], "c" * 64)\n        self.assertEqual(item["byte_count"], 2048)\n\n    def test_duplicate_race_within_pdf_fails(self):
+    def test_acquired_requires_valid_sha256_and_size(self):
+        for changes in ({"sha256": "bad", "byte_count": 2048}, {"sha256": "b" * 64, "byte_count": 100}):
+            with self.subTest(changes=changes), self.assertRaises(PdfBatchProgressError):
+                build_pdf_batch_summary(["202410010101"], [PdfBatch("pdf-a", ("202410010101",), "acquired", 1, **changes)])
+
+    def test_successful_batch_serializes_integrity_metadata(self):
+        summary = build_pdf_batch_summary(["202410010101"], [PdfBatch("pdf-a", ("202410010101",), "acquired", 1, sha256="c" * 64, byte_count=2048)])
+        item = pdf_batch_summary_to_dict(summary)["batches"][0]
+        self.assertEqual(item["sha256"], "c" * 64)
+        self.assertEqual(item["byte_count"], 2048)
+
+    def test_duplicate_race_within_pdf_fails(self):
         with self.assertRaisesRegex(PdfBatchProgressError, "duplicate race ID within PDF"):
             build_pdf_batch_summary(
                 ["202410010101"], [PdfBatch("pdf-a", ("202410010101", "202410010101"))]
