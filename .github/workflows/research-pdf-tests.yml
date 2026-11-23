@@ -4,27 +4,7 @@ on:
   push:
     branches:
       - "research/jra-pdf-acquisition-20261123"
-    paths:
-      - "scripts/download_jra_pdfs.py"
-      - "scripts/segment_jra_pdf_text.py"
-      - "scripts/jra_pdf_geometry.py"
-      - "scripts/inspect_jra_pdf_layout.py"
-      - "tests/test_download_jra_pdfs.py"
-      - "tests/test_segment_jra_pdf_text.py"
-      - "tests/test_jra_pdf_geometry.py"
-      - "tests/test_inspect_jra_pdf_layout.py"
-      - ".github/workflows/research-pdf-tests.yml"
   pull_request:
-    paths:
-      - "scripts/download_jra_pdfs.py"
-      - "scripts/segment_jra_pdf_text.py"
-      - "scripts/jra_pdf_geometry.py"
-      - "scripts/inspect_jra_pdf_layout.py"
-      - "tests/test_download_jra_pdfs.py"
-      - "tests/test_segment_jra_pdf_text.py"
-      - "tests/test_jra_pdf_geometry.py"
-      - "tests/test_inspect_jra_pdf_layout.py"
-      - ".github/workflows/research-pdf-tests.yml"
 
 permissions:
   contents: read
