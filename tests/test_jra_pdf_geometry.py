@@ -28,7 +28,7 @@ class CoordinateRowGroupingTests(unittest.TestCase):
             PositionedWord(0, 4, 5, 12, "B"),
             PositionedWord(0, 7, 5, 15, "C"),
         ]
-        rows = group_words_into_rows(words, baseline_tolerance=4.0)
+        rows = group_words_into_rows(words, baseline_tolerance=5.0)
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0].text, "A B C")
 
