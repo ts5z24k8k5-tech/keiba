@@ -1,3 +1,24 @@
-# Private JRA research inputs and downloaded source PDFs
+# Private source inputs and manifests
 private_input/
-output/jra_pdfs/
+
+# Local generated research outputs: PDFs, databases, datasets, reports and audit files
+output/
+
+# Local credentials and key material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local databases and model/data binaries
+*.sqlite
+*.sqlite3
+*.db
+*.parquet
+*.pkl
+*.joblib
+*.onnx
+*.pt
+*.pth
+*.h5
