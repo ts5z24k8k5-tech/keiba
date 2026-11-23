@@ -58,9 +58,9 @@ def audit_race_pdf_mapping(
         raise MappingAuditError("expected counts must be positive")
     if not mapping_rows or not manifest_rows:
         raise MappingAuditError("mapping and manifest must both be non-empty")
-    if set(mapping_rows[0]) < MAPPING_REQUIRED:
+    if not MAPPING_REQUIRED.issubset(mapping_rows[0]):
         raise MappingAuditError(f"mapping missing columns: {sorted(MAPPING_REQUIRED - set(mapping_rows[0]))}")
-    if set(manifest_rows[0]) < MANIFEST_REQUIRED:
+    if not MANIFEST_REQUIRED.issubset(manifest_rows[0]):
         raise MappingAuditError(f"manifest missing columns: {sorted(MANIFEST_REQUIRED - set(manifest_rows[0]))}")
 
     errors: list[dict[str, str]] = []
