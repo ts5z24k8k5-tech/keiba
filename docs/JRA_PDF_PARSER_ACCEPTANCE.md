@@ -180,3 +180,13 @@ A race absent from `races` is reported as missing. A supplied race can be struct
 - Example input fields: `expected_race_ids` plus `races: [{race_id, status, note_code?}]`. Keep real progress JSON under ignored local paths, never in the public repository.
 - Added 14 synthetic tests across the state machine and CLI. CI result pending for the latest commit; no actual race has advanced through this ledger.
 - Example: `python -m scripts.build_jra_pdf_progress_report --input private_input/jra_pdf_progress.json --output output/jra_pdf_progress_report.json`.
+
+
+## PDF-level retry targeting and race coverage (synthetic only)
+- Added `scripts/jra_pdf_batch_progress.py` to connect each private PDF key to its expected race IDs and acquisition state.
+- States are `pending`, `acquired`, `validated`, and `failed`. Only pending/failed PDF keys appear in the retry target list; acquired/validated PDFs are not needlessly re-downloaded.
+- The summary separately reports uncovered race IDs and race IDs mapped by more than one PDF. Unexpected race IDs fail validation rather than being silently ignored.
+- Added `scripts/build_jra_pdf_batch_report.py` for local JSON input/output. It never performs network retries itself, downloads PDFs, changes the mapping, or writes to SQLite. The output explicitly states `automatic_network_retry_performed: false` and `promotion_authorized: false`.
+- Added 13 synthetic tests across batch mapping and CLI validation. CI status for these newest additions is pending.
+- Keep the real PDF mapping/status JSON in ignored local paths. The repository contains no private mapping or source data.
+- Example: `python -m scripts.build_jra_pdf_batch_report --input private_input/jra_pdf_batches.json --output output/jra_pdf_batch_report.json`.
