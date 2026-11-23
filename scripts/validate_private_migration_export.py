@@ -202,13 +202,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.report:
         try:
             validate_report_destination(args.report, args.export_dir, args.manifest)
-            rendered_report = json.dumps(result, ensure_ascii=False, indent=2) + "\\n"
+            rendered_report = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
             with args.report.open("x", encoding="utf-8") as stream:
                 stream.write(rendered_report)
         except (ValueError, OSError) as exc:
             result["ok"] = False
             result.setdefault("findings", []).append(f"REPORT_WRITE_ERROR: {exc}")
-    rendered = json.dumps(result, ensure_ascii=False, indent=2) + "\\n"
+    rendered = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     print(rendered, end="")
     return 0 if result["ok"] else 1
 
