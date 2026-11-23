@@ -2,7 +2,10 @@ import unittest
 
 from scripts.jra_pdf_geometry import PositionedWord, TextRow
 from scripts.jra_pdf_columns import ColumnBand
-from scripts.jra_pdf_race_pipeline import (\n    RaceExtractionError, RunnerRowBand, build_race_candidates,\n    select_runner_rows_from_page_words,\n)
+from scripts.jra_pdf_race_pipeline import (
+    RaceExtractionError, RunnerRowBand, build_race_candidates,
+    select_runner_rows_from_page_words,
+)
 
 
 class RacePipelineTests(unittest.TestCase):
