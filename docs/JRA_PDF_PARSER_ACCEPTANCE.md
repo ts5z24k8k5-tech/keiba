@@ -112,3 +112,11 @@ Keep, at minimum:
 - The first PR CI run after adding the comparator executed 67 tests but failed to import `test_jra_pdf_race_pipeline.py` because a prior edit had left literal backslash-n sequences in its import statement.
 - Corrected that test import in commit `4691a426d61d1bd89a47753a77f7dad924a5e7e1`.
 - A new workflow run has not yet been returned for the correction; the suite is therefore pending re-verification. The 9 reconciliation tests did pass in the failed run, but the overall suite did not.
+
+
+## Race-level quality audit (synthetic only)
+- Added `scripts/jra_pdf_race_audit.py` to aggregate one race's extracted horse numbers and per-runner reconciliation reports.
+- Checks missing, duplicate, and out-of-range horse numbers; counts field-level mismatches and missing values; identifies runners without a comparison report; summarizes missing/unexpected race IDs across the expected manifest.
+- Exposes separate `structurally_complete` and `fully_reconciled` flags. Structural completeness alone is not proof of correctness. Full reconciliation requires a report for every expected horse number and zero differences in every report.
+- Added 10 synthetic tests, including invalid identity and incomplete comparison cases.
+- The latest commit has no reported Actions run yet. Tests are not claimed as CI-verified. No actual JRA PDF or independent official reference dataset has been processed; no database writes or promotion logic exist.
