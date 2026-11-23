@@ -156,3 +156,44 @@ This section supersedes the earlier point-in-time values in sections 1 and 3 whe
 - GitHub currently reports the public fork as 702 KB, fork=true, zero child forks, parent `yuhevita-wq/keiba`.
 
 The run inventory and artifact checks are bounded by currently returned API records. They do not prove that expired, deleted, or otherwise unavailable historical artifacts never existed. Do not run data collection, odds capture, or PDF acquisition in the public fork.
+
+
+## File-level migration classification — 2026-11-23 18:21 JST
+
+The current PR changed-file endpoint returned 47 paths. The full list was reviewed at path/category level. The PR delta consists of:
+- 4 workflow YAML files;
+- 1 `.gitignore`;
+- Markdown documentation (parser acceptance, public exposure audit, migration runbook/preflight material and README updates);
+- Python utility/CLI modules for PDF acquisition, layout, segmentation, runner-field normalization, reconciliation, progress and audit;
+- synthetic/unit-test files for those modules.
+
+No CSV, JSON, PDF, SQLite/database, model binary, manifest, odds snapshot, or training dataset appears in the current PR changed-file list. This is a path-level review; it does not prove that every string in every source file is free of embedded secrets.
+
+### Keep / do not copy / manual re-create
+
+| Class | Decision for private destination |
+|---|---|
+| Python source, tests, Markdown documentation | Copy through Git history after source review; keep tests synthetic until real PDF validation is separately authorized |
+| Workflow YAML | Copy as source only while Actions remain disabled; review default-branch workflows before enabling anything |
+| Existing public CSV/JSON outputs | They are in public history already. Do not add new versions or treat them as private input; decide separately whether the private working copy needs a clean baseline or historical archive |
+| 149-race mapping CSV and 23-PDF manifest | Not in current research branch. Transfer only through a private local channel / repository secret after private visibility is confirmed; never commit them |
+| Downloaded JRA PDFs, SQLite, raw race data, odds snapshots, model binaries, model training data | Keep outside Git; use separately permissioned private storage and encrypted backup |
+| Actions secrets, variables, environments, run logs/artifacts, repository permissions | Recreate/review manually; Git mirror does not carry these |
+| PR #1 comments, reviews, checks, labels, timeline | Keep original public PR untouched; new private PR is a new record and will not inherit these |
+
+### Important .gitignore limitation
+
+Current research-branch .gitignore excludes `private_input/`, `output/`, `.env*`, key files, common database extensions and common model/data binary extensions. It does not blanket-ignore every CSV or JSON file, nor arbitrary new folders such as `data/`, `datasets/`, `snapshots/`, or `results/`. Do not interpret it as a complete data-loss-prevention control. Existing tracked CSV/JSON files remain tracked even if an ignore rule is later added.
+
+Before every future commit, require a staged-file review:
+```sh
+git status --short
+git diff --cached --name-status
+git diff --cached --stat
+git diff --cached --check
+```
+Then manually inspect every staged CSV/JSON, binary, generated report, log, and workflow change. If the staged list contains an unapproved data path, stop and unstage it before committing. Do not rely on extension-only filters: private data can be embedded in text, Markdown, Python fixtures, or logs.
+
+### Historical public-data interpretation
+
+A private mirror can make the copied repository's future access private, but cannot reverse the fact that existing public commits were accessible. The historical public CSV/JSON outputs should be treated as disclosed, not as secrets that become secret again after migration. If a true credential is discovered, revoke/rotate it first; history cleanup is a separate remediation decision and must not be improvised during migration.
