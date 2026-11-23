@@ -44,6 +44,17 @@ class DownloaderTests(unittest.TestCase):
             p = Path(d)/"m.csv"; self.write_manifest(p, [self.row()])
             self.assertEqual(len(validate_manifest(p, expected_races=1)), 1)
 
+    def test_rejects_duplicate_pdf_filename(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d)/"m.csv"
+            rows = [
+                self.row(),
+                self.row(race_id="202408070902", url="https://www.jra.go.jp/datafile/seiseki/report/2024/other/2024-7kyoto9.pdf"),
+            ]
+            self.write_manifest(p, rows)
+            with self.assertRaises(ManifestError):
+                validate_manifest(p, expected_races=2)
+
     def test_rejects_non_jra_host(self):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d)/"m.csv"; self.write_manifest(p, [self.row(url="https://example.com/a.pdf")])
