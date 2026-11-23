@@ -1,6 +1,15 @@
 name: Research PDF downloader tests
 
 on:
+  push:
+    branches:
+      - "research/jra-pdf-acquisition-20261123"
+    paths:
+      - "scripts/download_jra_pdfs.py"
+      - "scripts/segment_jra_pdf_text.py"
+      - "tests/test_download_jra_pdfs.py"
+      - "tests/test_segment_jra_pdf_text.py"
+      - ".github/workflows/research-pdf-tests.yml"
   pull_request:
     paths:
       - "scripts/download_jra_pdfs.py"
@@ -23,5 +32,5 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.11"
-      - name: Run downloader unit tests
+      - name: Run acquisition and PDF segmentation tests
         run: python -m unittest discover -s tests -p 'test_*jra_pdf*.py' -v
