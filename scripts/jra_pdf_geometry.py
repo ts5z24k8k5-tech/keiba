@@ -76,11 +76,13 @@ def group_words_into_rows(
         if word.x1 < word.x0 or word.y1 < word.y0:
             raise ValueError("word has an inverted bounding box")
 
-        candidates = [
-            (abs(word.center_y - anchor), index)
-            for index, anchor in enumerate(anchors)
-            if abs(word.center_y - anchor) <= baseline_tolerance
-        ]
+        candidates = []
+        for index, bucket in enumerate(buckets):
+            centers = [item.center_y for item in bucket]
+            proposed_min = min(min(centers), word.center_y)
+            proposed_max = max(max(centers), word.center_y)
+            if proposed_max - proposed_min <= baseline_tolerance:
+                candidates.append((abs(word.center_y - anchors[index]), index))
         if not candidates:
             buckets.append([word])
             anchors.append(word.center_y)
