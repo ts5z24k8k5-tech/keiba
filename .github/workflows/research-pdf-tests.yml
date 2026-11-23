@@ -1,0 +1,25 @@
+name: Research PDF downloader tests
+
+on:
+  pull_request:
+    paths:
+      - "scripts/download_jra_pdfs.py"
+      - "tests/test_download_jra_pdfs.py"
+      - ".github/workflows/research-pdf-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out pull request
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Run downloader unit tests
+        run: python -m unittest discover -s tests -p 'test_download_jra_pdfs.py' -v
