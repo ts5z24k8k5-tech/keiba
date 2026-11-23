@@ -17,6 +17,8 @@ class DownloaderTests(unittest.TestCase):
             "https://www.jra.go.jp:8443/redirect.pdf",
             "https://user@www.jra.go.jp/redirect.pdf",
             "https://www.jra.go.jp:notaport/redirect.pdf",
+            "https://www.jra.go.jp/other/redirect.pdf",
+            "https://www.jra.go.jp/datafile/seiseki/report/readme.html",
         ):
             with self.subTest(target=target):
                 with self.assertRaises(ValueError):
@@ -44,6 +46,15 @@ class DownloaderTests(unittest.TestCase):
                 "date_start": "2024-12-28", "date_end": "2024-12-28",
                 "target_race_count": "1", "target_race_ids": race_id,
                 "locator_status": "official_pdf_url_web_open_verified"}
+
+    def test_download_rejects_final_url_outside_result_pdf_path(self):
+        body = b"%PDF-1.4" + b"x"*1500
+        def fake(url, timeout):
+            return body, 200, "application/pdf", "https://www.jra.go.jp/other/not-a-result.pdf"
+        with tempfile.TemporaryDirectory() as d:
+            r = download_one(self.row(), Path(d), retries=0, fetcher=fake, sleep=lambda _: None)
+            self.assertEqual(r.status, "failed")
+            self.assertIn("result-PDF policy", r.error)
 
     def test_manifest_validates_official_url_and_race_count(self):
         with tempfile.TemporaryDirectory() as d:
