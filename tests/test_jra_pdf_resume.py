@@ -64,6 +64,14 @@ class VerifiedResumeTests(unittest.TestCase):
                 stream.write(f"{self.URL},resume-test.pdf,downloaded,1508," + "a" * 64 + ",200,application/pdf\n")
             self.assertNotIn(self.URL, load_prior_download_audit(Path(directory)))
 
+    def test_already_verified_audit_remains_reusable_on_next_run(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self.setup_asset(directory, status="already_verified")
+            prior = load_prior_download_audit(Path(directory))
+            self.assertIn(self.URL, prior)
+            result = reuse_verified_pdf(self.ROW, Path(directory), prior)
+            self.assertEqual(result.status, "already_verified")
+
     def test_wrong_filename_is_not_reused(self):
         with tempfile.TemporaryDirectory() as directory:
             self.setup_asset(directory, filename="other.pdf")
