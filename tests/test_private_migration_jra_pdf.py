@@ -130,6 +130,28 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
         self.assertTrue(any(x.startswith("EXCLUDED_PATH: .env") for x in findings))
         self.assertTrue(any(x.startswith("EXCLUDED_PATH: private_input/") for x in findings))
 
+    def test_rejects_all_high_risk_directory_patterns_case_insensitively(self):
+        forbidden_dirs = ("results", "private_input", "private-input", "output", "outputs",
+                          "data", "datasets", "snapshots", "models", "logs", "cache",
+                          ".git", ".ssh", ".aws", ".gnupg", "credentials", "secrets", "tokens")
+        for directory in forbidden_dirs:
+            self.write_export(f"{directory}/sample.py", b"synthetic")
+        findings = self.result()["findings"]
+        for directory in forbidden_dirs:
+            with self.subTest(directory=directory):
+                self.assertTrue(any(x.startswith(f"EXCLUDED_PATH: {directory}/") for x in findings))
+
+    def test_rejects_private_data_and_model_file_extensions(self):
+        forbidden_files = ("race.pdf", "state.sqlite", "state.db", "features.parquet",
+                           "model.pkl", "model.joblib", "model.onnx", "model.pt",
+                           "model.pth", "model.h5", "odds.csv", "manifest.json")
+        for filename in forbidden_files:
+            self.write_export(f"docs/{filename}", b"synthetic")
+        findings = self.result()["findings"]
+        for filename in forbidden_files:
+            with self.subTest(filename=filename):
+                self.assertTrue(any(x.startswith(f"EXCLUDED_PATH: docs/{filename}") for x in findings))
+
     def test_detects_missing_allowlisted_file(self):
         (self.export / "scripts/example.py").unlink()
         self.assertIn("MISSING_FILE: scripts/example.py", self.result()["findings"])
