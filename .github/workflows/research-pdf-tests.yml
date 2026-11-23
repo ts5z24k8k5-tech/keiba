@@ -20,5 +20,5 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.11"
-      - name: Run acquisition, segmentation, geometry and layout tests
+      - name: Run all JRA PDF research tests
         run: python -m unittest discover -s tests -p 'test_*jra_pdf*.py' -v
