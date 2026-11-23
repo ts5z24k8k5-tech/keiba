@@ -172,20 +172,44 @@ def validate_export(root: Path, manifest_path: Path) -> dict:
     }
 
 
+def validate_report_destination(report: Path, export_root: Path, manifest_path: Path) -> None:
+    """Refuse report paths that could mutate the export or overwrite its manifest."""
+    if report.is_symlink():
+        raise fail(f"report path must not be a symlink: {report}")
+    root_resolved = export_root.resolve(strict=True)
+    report_resolved = report.resolve(strict=False)
+    manifest_resolved = manifest_path.resolve(strict=False)
+    if report_resolved == root_resolved or root_resolved in report_resolved.parents:
+        raise fail("report path must be outside the export directory")
+    if report_resolved == manifest_resolved:
+        raise fail("report path must not overwrite the manifest")
+    if report.exists():
+        raise fail(f"report path already exists; refusing to overwrite: {report}")
+    if not report.parent.is_dir():
+        raise fail(f"report parent directory does not exist: {report.parent}")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--export-dir", required=True, type=Path)
     parser.add_argument("--manifest", required=True, type=Path)
-    parser.add_argument("--report", type=Path, help="optional JSON report path; export remains read-only")
+    parser.add_argument("--report", type=Path, help="optional JSON report path outside the export directory")
     args = parser.parse_args(argv)
     try:
         result = validate_export(args.export_dir, args.manifest)
-    except ValueError as exc:
+    except (ValueError, OSError) as exc:
         result = {"ok": False, "findings": [f"MANIFEST_OR_INPUT_ERROR: {exc}"]}
-    rendered = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
-    print(rendered, end="")
     if args.report:
-        args.report.write_text(rendered, encoding="utf-8")
+        try:
+            validate_report_destination(args.report, args.export_dir, args.manifest)
+            rendered_report = json.dumps(result, ensure_ascii=False, indent=2) + "\\n"
+            with args.report.open("x", encoding="utf-8") as stream:
+                stream.write(rendered_report)
+        except (ValueError, OSError) as exc:
+            result["ok"] = False
+            result.setdefault("findings", []).append(f"REPORT_WRITE_ERROR: {exc}")
+    rendered = json.dumps(result, ensure_ascii=False, indent=2) + "\\n"
+    print(rendered, end="")
     return 0 if result["ok"] else 1
 
 
