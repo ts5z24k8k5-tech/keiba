@@ -1,13 +1,14 @@
-"""Coordinate-aware grouping primitives for JRA PDF text extraction.
+"""Coordinate-aware primitives for extracting text rows from JRA result PDFs.
 
-Input coordinates follow PyMuPDF's page coordinate system (points, origin at
-top-left). This module is deliberately independent of PyMuPDF so geometry
-logic can be unit-tested without downloading or parsing a real PDF.
+The geometry layer accepts PyMuPDF's page.get_text("words") tuples but does
+not import PyMuPDF. It can therefore be tested without external PDFs or the
+optional PDF library.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable
+from statistics import median
+from typing import Iterable, Sequence
 
 
 @dataclass(frozen=True)
@@ -33,22 +34,41 @@ class TextRow:
         return " ".join(word.text for word in self.words)
 
 
+def positioned_words_from_pymupdf(raw_words: Iterable[Sequence[object]]) -> list[PositionedWord]:
+    """Convert PyMuPDF 'words' tuples (x0,y0,x1,y1,text,...) to our type."""
+    converted = []
+    for item in raw_words:
+        if len(item) < 5:
+            raise ValueError("PyMuPDF word tuple must contain at least five fields")
+        try:
+            x0, y0, x1, y1 = (float(item[i]) for i in range(4))
+        except (TypeError, ValueError) as exc:
+            raise ValueError("word coordinates must be numeric") from exc
+        text = str(item[4])
+        if x1 < x0 or y1 < y0:
+            raise ValueError("word has an inverted bounding box")
+        if text.strip():
+            converted.append(PositionedWord(x0, y0, x1, y1, text))
+    return converted
+
+
 def group_words_into_rows(
     words: Iterable[PositionedWord],
     *,
     baseline_tolerance: float = 2.5,
 ) -> list[TextRow]:
-    """Group positioned words by vertical baseline, then order left-to-right.
+    """Group words by vertical center without allowing tolerance-chain drift.
 
-    A word joins the closest existing row whose center is within the explicit
-    tolerance. No semantic column inference or runner parsing is performed.
+    Each row has a fixed anchor: its median vertical center. A candidate joins
+    only if it is within tolerance of that anchor. Words are sorted left-right.
+    This is geometric grouping only; it does not infer semantic columns.
     """
     if baseline_tolerance < 0:
         raise ValueError("baseline_tolerance must be non-negative")
 
     ordered = sorted(words, key=lambda word: (word.center_y, word.x0, word.x1))
-    rows: list[list[PositionedWord]] = []
-    centers: list[float] = []
+    buckets: list[list[PositionedWord]] = []
+    anchors: list[float] = []
 
     for word in ordered:
         if not word.text.strip():
@@ -57,22 +77,22 @@ def group_words_into_rows(
             raise ValueError("word has an inverted bounding box")
 
         candidates = [
-            (abs(word.center_y - center), index)
-            for index, center in enumerate(centers)
-            if abs(word.center_y - center) <= baseline_tolerance
+            (abs(word.center_y - anchor), index)
+            for index, anchor in enumerate(anchors)
+            if abs(word.center_y - anchor) <= baseline_tolerance
         ]
         if not candidates:
-            rows.append([word])
-            centers.append(word.center_y)
+            buckets.append([word])
+            anchors.append(word.center_y)
             continue
 
         _, index = min(candidates)
-        rows[index].append(word)
-        centers[index] = sum(item.center_y for item in rows[index]) / len(rows[index])
+        buckets[index].append(word)
+        anchors[index] = median(item.center_y for item in buckets[index])
 
-    result = []
-    for center, row_words in zip(centers, rows):
-        row_words.sort(key=lambda word: (word.x0, word.x1))
-        result.append(TextRow(center, tuple(row_words)))
-    result.sort(key=lambda row: row.y_center)
-    return result
+    rows = []
+    for anchor, bucket in zip(anchors, buckets):
+        bucket.sort(key=lambda word: (word.x0, word.x1))
+        rows.append(TextRow(anchor, tuple(bucket)))
+    rows.sort(key=lambda row: row.y_center)
+    return rows
