@@ -90,3 +90,11 @@ Keep, at minimum:
 - The first implementation's race-ID regex was corrected during review; column bands are now materialized once so an iterator can safely be reused across rows.
 - GitHub Actions has not reported a run for these latest commits. The 6 new tests and previous 8 field tests are therefore not claimed as CI-verified.
 - This pipeline is a composition of synthetic-tested primitives, not proof of extraction accuracy. The next gate is to acquire an original JRA PDF, inspect actual row/column geometry, define reviewed row-selection and column-band rules, and compare extracted counts and values against the official result.
+
+
+## Explicit vertical runner-row selection
+- Added `RunnerRowBand` and `select_runner_rows_from_page_words` to the composed race pipeline.
+- The caller must provide reviewed y-coordinate intervals for each expected runner row. Each interval must contain exactly one geometric text row; empty bands, multiple rows, overlapping bands, and words outside all configured bands are hard errors.
+- This is intentionally operator-configured rather than an automatic horse-row detector. It prevents headers/footers from being silently accepted or discarded, but depends on accurate per-page measurements from original PDFs.
+- Added 5 synthetic tests for successful selection and the main failure modes.
+- No GitHub Actions run is currently reported for the latest commits, so these tests remain unverified by CI. No real PDF layout has been measured and no real race has been extracted.
