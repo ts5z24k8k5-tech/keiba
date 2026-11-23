@@ -13,7 +13,7 @@ from scripts.jra_pdf_batch_progress import (
 )
 
 RACE_ID_RE = re.compile(r"^\d{12}$")
-ALLOWED_KEYS = {"pdf_key", "race_ids", "status", "attempt_count", "failure_code"}
+ALLOWED_KEYS = {"pdf_key", "race_ids", "status", "attempt_count", "failure_code", "sha256", "byte_count"}
 
 
 def build_report(payload: Any) -> dict[str, object]:
