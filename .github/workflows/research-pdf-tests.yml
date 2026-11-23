@@ -4,7 +4,9 @@ on:
   pull_request:
     paths:
       - "scripts/download_jra_pdfs.py"
+      - "scripts/segment_jra_pdf_text.py"
       - "tests/test_download_jra_pdfs.py"
+      - "tests/test_segment_jra_pdf_text.py"
       - ".github/workflows/research-pdf-tests.yml"
 
 permissions:
@@ -22,4 +24,4 @@ jobs:
         with:
           python-version: "3.11"
       - name: Run downloader unit tests
-        run: python -m unittest discover -s tests -p 'test_download_jra_pdfs.py' -v
+        run: python -m unittest discover -s tests -p 'test_*jra_pdf*.py' -v
