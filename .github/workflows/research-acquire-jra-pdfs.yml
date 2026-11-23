@@ -31,7 +31,7 @@ jobs:
           python scripts/download_jra_pdfs.py \
             --manifest private_input/jra_official_pdf_manifest_23.csv \
             --out output/jra_pdfs \
-            --expected-races 149 \
+            --expected-races 149 --expected-pdfs 23 \
             --timeout 30 --retries 3 --delay 1.5
       - name: Publish acquisition artifact only
         if: always()
