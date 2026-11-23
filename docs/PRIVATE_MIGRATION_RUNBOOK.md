@@ -186,3 +186,25 @@ Immediately before any future migration, re-query and record:
 - source tree and workflow file hashes.
 
 Do not reuse the SHA values in this addendum blindly if the research branch advances again. This addendum is an audit record, not permission to create a destination or push refs.
+
+
+## Live correction and staged-data gate — 2026-11-23 18:21 JST
+
+This section supersedes older point-in-time values above when they differ:
+- Current public `main`: `6ec783499b8e3b77274e59fb251936d90a231d8d`.
+- Research branch at the start of this audit pass: `d2e881cd2943d617a0b3013a7593ae22e9eb3722`; the audit-document update itself will advance this branch again. Re-query immediately before any future migration.
+- PR #1: Open / Draft / unmerged; 143 commits, 47 changed files, +4,656 / -16 at the start of this audit pass.
+- Latest inspected runs on the prior research head both completed successfully: push and PR jobs each ran 149 tests; neither produced artifacts. The next audit-document update triggers fresh CI, which must be checked separately.
+- Repository size reported at this check: 735 KB. Both current branches remain unprotected. No destination repository has been created.
+
+### File classification and staging gate
+
+The current PR changed-file list contains only source scripts, tests, documentation, workflow YAML, and `.gitignore`; no CSV, JSON, PDF, database, model binary, manifest, odds snapshot, or training dataset appears in that list. This is a path-level review, not a full source-code secret scan. See `docs/PRIVATE_MIGRATION_PREFLIGHT_AUDIT.md` for the class-by-class decision matrix.
+
+The `.gitignore` is not a universal data-loss-prevention rule. It does not exclude every CSV/JSON file or every possible private-data directory. Before every commit, inspect `git status --short`, `git diff --cached --name-status`, `git diff --cached --stat`, and `git diff --cached --check`; manually inspect all staged data-like files. Never assume an ignored extension or folder list catches private data embedded in text, source, fixtures, or logs.
+
+Do not automatically mirror public CSV/JSON outputs as operational research inputs. They are already publicly disclosed in the source history. The private mapping CSV and manifest, downloaded PDFs, SQLite, model files, raw datasets, and private odds snapshots remain outside Git. GitHub Actions settings/secrets/variables/artifacts and PR metadata must be handled separately.
+
+### Stop condition
+
+No migration operation is authorized by this document. Do not create a repository, push refs, change source visibility, detach the fork, merge PR #1, or modify public `main` without a separate explicit instruction.
