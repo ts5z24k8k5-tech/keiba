@@ -1,6 +1,7 @@
 """Track PDF-level acquisition batches and their race coverage; no network or DB I/O."""
 from __future__ import annotations
 
+import re
 from collections import Counter
 from dataclasses import dataclass
 from typing import Sequence
@@ -8,6 +9,7 @@ from typing import Sequence
 
 PDF_STATES = {"pending", "acquired", "validated", "failed"}
 RETRYABLE_STATES = {"pending", "failed"}
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 class PdfBatchProgressError(ValueError):
@@ -21,6 +23,8 @@ class PdfBatch:
     status: str = "pending"
     attempt_count: int = 0
     failure_code: str | None = None
+    sha256: str | None = None
+    byte_count: int | None = None
 
 
 @dataclass(frozen=True)
@@ -58,9 +62,18 @@ def build_pdf_batch_summary(
             raise PdfBatchProgressError(f"invalid PDF status: {batch.status}")
         if not isinstance(batch.attempt_count, int) or isinstance(batch.attempt_count, bool) or batch.attempt_count < 0:
             raise PdfBatchProgressError("attempt_count must be a non-negative integer")
-        if batch.status in {"acquired", "validated"} and batch.attempt_count < 1:
-            raise PdfBatchProgressError("acquired/validated PDF must have at least one attempt")
-        if batch.status == "failed" and not batch.failure_code:
+        if batch.status == "failed" and batch.attempt_count < 1:
+            raise PdfBatchProgressError("failed PDF must have at least one attempt")
+        if batch.status in {"acquired", "validated"}:
+            if batch.attempt_count < 1:
+                raise PdfBatchProgressError("acquired/validated PDF must have at least one attempt")
+            if not isinstance(batch.sha256, str) or not SHA256_RE.fullmatch(batch.sha256):
+                raise PdfBatchProgressError("acquired/validated PDF requires a lowercase SHA-256")
+            if not isinstance(batch.byte_count, int) or isinstance(batch.byte_count, bool) or batch.byte_count < 1024:
+                raise PdfBatchProgressError("acquired/validated PDF requires byte_count >= 1024")
+        elif batch.sha256 is not None or batch.byte_count is not None:
+            raise PdfBatchProgressError("SHA-256 and byte_count are only allowed for acquired/validated PDFs")
+        if batch.status == "failed" and (not isinstance(batch.failure_code, str) or not batch.failure_code.strip()):
             raise PdfBatchProgressError("failed PDF requires a failure_code")
         if batch.status != "failed" and batch.failure_code is not None:
             raise PdfBatchProgressError("failure_code is only allowed for failed PDFs")
@@ -108,6 +121,8 @@ def pdf_batch_summary_to_dict(summary: PdfBatchSummary) -> dict[str, object]:
                 "status": batch.status,
                 "attempt_count": batch.attempt_count,
                 "failure_code": batch.failure_code,
+                "sha256": batch.sha256,
+                "byte_count": batch.byte_count,
             }
             for batch in summary.batches
         ],
