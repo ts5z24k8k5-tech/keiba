@@ -78,6 +78,20 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
         self.assertTrue(any(x.startswith("REPORT_WRITE_ERROR:") and "outside the export" in x for x in result["findings"]))
         self.assertFalse(report.exists())
 
+    def test_cli_refuses_symlink_report_without_touching_target(self):
+        target = self.base / "keep.txt"
+        target.write_text("keep-me", encoding="utf-8")
+        report = self.base / "report-link.json"
+        try:
+            report.symlink_to(target)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlinks unavailable on this platform")
+        completed = self.run_cli("--report", report)
+        self.assertEqual(completed.returncode, 1)
+        self.assertEqual(target.read_text(encoding="utf-8"), "keep-me")
+        result = json.loads(completed.stdout)
+        self.assertTrue(any(x.startswith("REPORT_WRITE_ERROR:") and "symlink" in x for x in result["findings"]))
+
     def test_cli_refuses_to_overwrite_existing_report(self):
         report = self.base / "existing-report.json"
         report.write_text("keep-me", encoding="utf-8")
@@ -149,6 +163,27 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
         }
         self.write_manifest([entry, entry])
         with self.assertRaisesRegex(ValueError, "duplicate manifest path"):
+            self.result()
+
+    def test_rejects_windows_reserved_names_and_alternate_stream_paths(self):
+        for unsafe_path in ("CON.py", "notes.txt:stream.py", "folder./module.py"):
+            entry = {
+                "path": unsafe_path, "source_git_blob_sha1": "b" * 40,
+                "source_bytes": 1, "status": "ALLOW_CANDIDATE",
+                "export": True, "expected_sha256": self.digest,
+            }
+            self.write_manifest([entry])
+            with self.subTest(path=unsafe_path), self.assertRaisesRegex(ValueError, "unsafe"):
+                self.result()
+
+    def test_rejects_boolean_as_source_byte_count(self):
+        entry = {
+            "path": "scripts/example.py", "source_git_blob_sha1": "b" * 40,
+            "source_bytes": True, "status": "ALLOW_CANDIDATE",
+            "export": True, "expected_sha256": self.digest,
+        }
+        self.write_manifest([entry])
+        with self.assertRaisesRegex(ValueError, "byte count"):
             self.result()
 
     def test_rejects_manifest_path_traversal(self):
