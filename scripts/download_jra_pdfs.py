@@ -58,6 +58,7 @@ def validate_manifest(path: Path, expected_races: int = 149, expected_pdfs: int 
         raise ManifestError(f"expected {expected_pdfs} PDF rows, found {len(rows)}")
 
     seen_urls: set[str] = set()
+    seen_filenames: set[str] = set()
     seen_ids: set[str] = set()
     counted = 0
     for i, row in enumerate(rows, 2):
@@ -70,6 +71,10 @@ def validate_manifest(path: Path, expected_races: int = 149, expected_pdfs: int 
         if url in seen_urls:
             raise ManifestError(f"row {i}: duplicate PDF URL")
         seen_urls.add(url)
+        filename = Path(p.path).name
+        if not filename or filename in seen_filenames:
+            raise ManifestError(f"row {i}: empty or duplicate PDF filename {filename!r}")
+        seen_filenames.add(filename)
         ids = [x.strip() for x in (row.get("target_race_ids") or "").split(";") if x.strip()]
         try:
             declared = int(row["target_race_count"])
