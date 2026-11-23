@@ -23,13 +23,15 @@ This runbook is a plan only. No repository migration or visibility change has be
 - Child forks reported for this fork: 0
 - Current `main`: `6ec783499b8e3b77274e59fb251936d90a231d8d`
 - Research branch: `research/jra-pdf-acquisition-20261123`
-- Research branch head: `77262e39e7405c18235b4ead603b3f9ced60fc09`
-- PR #1: open, draft, unmerged; base `main`, head research branch; 135 commits, 45 changed files (+4,266 / -16).
-- Relative to current `main`, the research branch is 135 commits ahead and 2 commits behind. Merge base is `9203de7c9adc300d167be5cf32ce12c3323c41d5`.
+- Research branch head at the preflight snapshot before the latest audit additions: `8f6ab1599a1167dc41047eb884f6b74f58d0d082` (record the live head again immediately before migration; do not use this historical snapshot blindly)
+- PR #1 at the 8f6ab159 snapshot: open, draft, unmerged; base `main`, head research branch; 138 commits, 46 changed files (+4,454 / -16).
+- At that snapshot, relative to current `main`, the research branch was 138 commits ahead and 2 commits behind. Merge base is `9203de7c9adc300d167be5cf32ce12c3323c41d5`.
 
 The fork appears to meet GitHub's manual "Leave network" eligibility criteria (public, under 1 GB, no child forks). **Do not use that option for this migration**: GitHub documents that manual detachment does not retain pull requests, issues, wikis, stars, watchers, comments, or other repository metadata. It is permanent. The existing PR #1 would be lost from the detached repository.
 
 ## Public exposure findings
+
+The detailed 2026-11-23 follow-up inventory is in `docs/PRIVATE_MIGRATION_PREFLIGHT_AUDIT.md`. It records the current 35-file `main` tree, 79-file research tree, 38-commit `main` history, 200 available Actions run records, and the branch-protection gap.
 
 The current public `main` tree contains model-derived probability files, candidate ticket combinations, market snapshots, and evaluation/audit outputs. The historical commit `9203de7c9adc300d167be5cf32ce12c3323c41d5` explicitly publishes the 1,554-row candidate-ticket CSV. A private mirror will preserve this history; it will not reverse the fact that those historical files were already public.
 
@@ -87,9 +89,12 @@ Keep the mirror directory, bundle, refs list, and bundle SHA-256 as separate bac
 1. In the user's own GitHub account, create a new repository such as `keiba-private`.
 2. Set visibility to **Private** at creation.
 3. Do not initialize it with a README, license, or .gitignore; the destination should be empty.
-4. Confirm the destination owner and URL before pushing.
+4. **Disable GitHub Actions in the destination immediately**, before the first mirror push. The source `main` still contains a push-triggered odds workflow with write permission; do not risk firing it during initial migration.
+5. Confirm the destination owner and URL before pushing.
 
 ### 4. Mirror Git refs and history
+
+Keep Actions disabled throughout this step and the initial verification. A mirror push may update the destination `main` and encounter the source's historical push-triggered workflow definitions.
 
 Only after confirming that the destination is the intended empty private repository:
 
@@ -103,7 +108,7 @@ Use the exact private destination URL. `--mirror` synchronizes refs and can dele
 
 Compare source and destination:
 - `main` must point to `6ec783499b8e3b77274e59fb251936d90a231d8d`.
-- `research/jra-pdf-acquisition-20261123` must point to `77262e39e7405c18235b4ead603b3f9ced60fc09`.
+- `research/jra-pdf-acquisition-20261123` must point to the exact SHA recorded immediately before migration. The `8f6ab159...` value above is only the preflight snapshot, not a permanent expected SHA.
 - Branch/tag refs and unique reachable commit count must match the local mirror.
 - Run `git fsck --full` on the mirror.
 - Confirm the destination repository is Private in GitHub settings.
@@ -122,12 +127,14 @@ Do not start Actions yet.
 
 Repository secrets, variables, environments, permissions, and workflow settings are not Git refs and are not copied by `git push --mirror`.
 
-1. Review all workflow files on the private default branch before enabling Actions.
-2. Ensure the private-repository visibility gate is present before any data, odds, PDF, or artifact step.
-3. Keep least-privilege token permissions and success-only artifact publication.
-4. Re-add `JRA_PDF_MANIFEST_B64` manually as a repository secret only after confirming the destination is Private. Never commit the manifest or secret value.
-5. Keep all data collection and acquisition workflows disabled until the private branch/default-branch review is complete.
-6. Verify artifact contents and retention settings before the first manual run.
+1. Keep Actions disabled until the initial mirror has been verified.
+2. Review all workflow files on the private default branch before enabling Actions. The copied `main` still contains the old odds `push` trigger and historical-data workflow; the research-branch safety changes are not automatically applied to `main`.
+3. Ensure the private-repository visibility gate is present before any data, odds, PDF, or artifact step.
+4. Keep least-privilege token permissions and success-only artifact publication.
+5. Re-add `JRA_PDF_MANIFEST_B64` manually as a repository secret only after confirming the destination is Private. Never commit the manifest or secret value.
+6. Configure private `main` branch protection/rulesets (PR required, CI required, no force-push or deletion) before routine work.
+7. Keep all data collection and acquisition workflows disabled until the private branch/default-branch review is complete.
+8. Verify artifact contents and retention settings before the first manual run.
 
 ## Rollback and stop conditions
 
