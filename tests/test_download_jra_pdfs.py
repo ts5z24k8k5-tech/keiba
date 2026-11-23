@@ -11,7 +11,13 @@ class DownloaderTests(unittest.TestCase):
         request = __import__("urllib.request", fromlist=["Request"]).Request(
             "https://www.jra.go.jp/datafile/seiseki/report/a.pdf"
         )
-        for target in ("https://example.com/steal", "http://www.jra.go.jp/redirect.pdf"):
+        for target in (
+            "https://example.com/steal",
+            "http://www.jra.go.jp/redirect.pdf",
+            "https://www.jra.go.jp:8443/redirect.pdf",
+            "https://user@www.jra.go.jp/redirect.pdf",
+            "https://www.jra.go.jp:notaport/redirect.pdf",
+        ):
             with self.subTest(target=target):
                 with self.assertRaises(ValueError):
                     handler.redirect_request(request, None, 302, "Found", {}, target)
@@ -54,6 +60,20 @@ class DownloaderTests(unittest.TestCase):
             self.write_manifest(p, rows)
             with self.assertRaises(ManifestError):
                 validate_manifest(p, expected_races=2)
+
+    def test_rejects_nonstandard_port_and_userinfo(self):
+        bad_urls = (
+            "https://www.jra.go.jp:8443/datafile/seiseki/report/a.pdf",
+            "https://user@www.jra.go.jp/datafile/seiseki/report/a.pdf",
+            "https://www.jra.go.jp:notaport/datafile/seiseki/report/a.pdf",
+        )
+        for url in bad_urls:
+            with self.subTest(url=url):
+                with tempfile.TemporaryDirectory() as d:
+                    p = Path(d)/"m.csv"
+                    self.write_manifest(p, [self.row(url=url)])
+                    with self.assertRaises(ManifestError):
+                        validate_manifest(p, expected_races=1)
 
     def test_rejects_non_jra_host(self):
         with tempfile.TemporaryDirectory() as d:
