@@ -50,7 +50,7 @@ def build_integrated_progress_report(payload: Any) -> dict[str, object]:
         if race_id in supplied:
             raise IntegrationError(f"duplicate race progress row: {race_id}")
         supplied[race_id] = RaceProgress(race_id, item["status"], item.get("note_code"))
-    pdf_by_race = {race_id: batch for batch in batches for race_id in batch.race_ids}
+    unexpected_progress = set(supplied) - set(expected)\n    if unexpected_progress:\n        raise IntegrationError(f"unexpected race progress IDs: {sorted(unexpected_progress)}")\n    pdf_by_race = {race_id: batch for batch in batches for race_id in batch.race_ids}
     derived = []
     for race_id in expected:
         batch = pdf_by_race[race_id]
