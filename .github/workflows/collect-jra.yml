@@ -20,7 +20,7 @@ jobs:
         run: |
           visibility="$(gh api "repos/${GITHUB_REPOSITORY}" --jq .visibility)"
           if [ "$visibility" != "private" ]; then
-            echo "::error::Training database and split CSV artifacts must not be published from a public repository. Make the repository private first."
+            echo "::error::Training database and split CSV artifacts must not be published from a public repository. Use a private standalone repository before running this workflow."
             exit 1
           fi
 
