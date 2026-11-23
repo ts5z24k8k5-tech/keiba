@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+"""Read-only validator for a clean-history migration export.
+
+The manifest is a reviewed path allowlist. This tool never copies, deletes,
+rewrites, or uploads export files. Exit status is non-zero on any finding.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+import sys
+from pathlib import Path, PurePosixPath
+
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
+FORBIDDEN_PARTS = {
+    "results", "private_input", "private-input", "output", "outputs",
+    "data", "datasets", "snapshots", "models", "logs", "cache", "__pycache__",
+    ".git",
+}
+FORBIDDEN_SUFFIXES = {
+    ".pdf", ".sqlite", ".sqlite3", ".db", ".parquet", ".pkl", ".pickle",
+    ".joblib", ".onnx", ".pt", ".pth", ".h5", ".csv",
+}
+FORBIDDEN_NAMES = {
+    ".env", ".env.local", ".env.production", "id_rsa", "id_ed25519",
+    "credentials", "secrets.json",
+}
+
+
+def fail(message: str) -> ValueError:
+    return ValueError(message)
+
+
+def validate_manifest(data: object) -> tuple[dict[str, dict], list[str]]:
+    if not isinstance(data, dict) or data.get("schema_version") != 1:
+        raise fail("manifest must be an object with schema_version=1")
+    source = data.get("source")
+    if not isinstance(source, dict) or not re.fullmatch(r"[0-9a-f]{40}", str(source.get("commit", ""))):
+        raise fail("manifest source.commit must be a 40-character lowercase SHA")
+    entries = data.get("entries")
+    if not isinstance(entries, list) or not entries:
+        raise fail("manifest entries must be a non-empty list")
+    allowed: dict[str, dict] = {}
+    errors: list[str] = []
+    seen: set[str] = set()
+    for index, item in enumerate(entries):
+        if not isinstance(item, dict):
+            raise fail(f"entries[{index}] must be an object")
+        path = item.get("path")
+        if not isinstance(path, str) or not path or "\\" in path:
+            raise fail(f"entries[{index}].path is invalid")
+        pure = PurePosixPath(path)
+        if pure.is_absolute() or any(part in ("", ".", "..") for part in path.split("/")):
+            raise fail(f"entries[{index}].path is unsafe: {path!r}")
+        if path in seen:
+            raise fail(f"duplicate manifest path: {path}")
+        seen.add(path)
+        if not SHA1_RE.fullmatch(str(item.get("source_git_blob_sha1", ""))):
+            raise fail(f"invalid source Git blob SHA-1 for {path}")
+        if not isinstance(item.get("source_bytes"), int) or item["source_bytes"] < 0:
+            raise fail(f"invalid source byte count for {path}")
+        export = item.get("export")
+        if not isinstance(export, bool):
+            raise fail(f"export must be boolean for {path}")
+        digest = item.get("expected_sha256")
+        if digest is not None and not SHA256_RE.fullmatch(str(digest)):
+            raise fail(f"invalid expected_sha256 for {path}")
+        if export:
+            allowed[path] = item
+    if not allowed:
+        raise fail("manifest contains no export=true entries")
+    return allowed, errors
+
+
+def forbidden_reason(rel: str) -> str | None:
+    parts = rel.split("/")
+    lower_parts = [p.lower() for p in parts]
+    name = parts[-1].lower()
+    if any(p in FORBIDDEN_PARTS for p in lower_parts):
+        return "excluded directory/pattern"
+    if name in FORBIDDEN_NAMES or name.startswith(".env."):
+        return "credential/environment file"
+    if name.endswith(FORBIDDEN_SUFFIXES):
+        return "excluded data/binary file type"
+    if name.endswith((".pem", ".key", ".p12", ".pfx")):
+        return "credential/key material"
+    return None
+
+
+def walk_export(root: Path) -> tuple[set[str], list[str]]:
+    found: set[str] = set()
+    findings: list[str] = []
+    for path in root.rglob("*"):
+        rel = path.relative_to(root).as_posix()
+        if path.is_symlink():
+            findings.append(f"SYMLINK_REJECTED: {rel}")
+            continue
+        if path.is_dir():
+            continue
+        if not path.is_file():
+            findings.append(f"NON_REGULAR_FILE: {rel}")
+            continue
+        reason = forbidden_reason(rel)
+        if reason:
+            findings.append(f"EXCLUDED_PATH: {rel} ({reason})")
+        found.add(rel)
+    return found, findings
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def validate_export(root: Path, manifest_path: Path) -> dict:
+    if not root.exists() or not root.is_dir():
+        raise fail(f"export root is not a directory: {root}")
+    if root.is_symlink():
+        raise fail("export root must not be a symlink")
+    try:
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise fail(f"cannot read manifest: {exc}") from exc
+    allowed, _ = validate_manifest(data)
+    found, findings = walk_export(root)
+    expected_paths = set(allowed)
+    for missing in sorted(expected_paths - found):
+        findings.append(f"MISSING_FILE: {missing}")
+    for extra in sorted(found - expected_paths):
+        findings.append(f"UNAUTHORIZED_FILE: {extra}")
+    checked = 0
+    for rel in sorted(expected_paths & found):
+        item = allowed[rel]
+        path = root.joinpath(*rel.split("/"))
+        if path.is_symlink() or not path.is_file():
+            continue
+        actual_size = path.stat().st_size
+        if actual_size != item["source_bytes"]:
+            findings.append(f"SIZE_MISMATCH: {rel}: expected={item['source_bytes']} actual={actual_size}")
+        expected_digest = item.get("expected_sha256")
+        if expected_digest is None:
+            findings.append(f"SHA256_UNPINNED: {rel}")
+            continue
+        actual_digest = sha256_file(path)
+        checked += 1
+        if actual_digest != expected_digest:
+            findings.append(f"SHA256_MISMATCH: {rel}: expected={expected_digest} actual={actual_digest}")
+    return {
+        "ok": not findings,
+        "source_commit": data["source"]["commit"],
+        "allowlisted_files": len(expected_paths),
+        "found_files": len(found),
+        "sha256_checked": checked,
+        "findings": findings,
+    }
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--export-dir", required=True, type=Path)
+    parser.add_argument("--manifest", required=True, type=Path)
+    parser.add_argument("--report", type=Path, help="optional JSON report path; export remains read-only")
+    args = parser.parse_args(argv)
+    try:
+        result = validate_export(args.export_dir, args.manifest)
+    except ValueError as exc:
+        result = {"ok": False, "findings": [f"MANIFEST_OR_INPUT_ERROR: {exc}"]}
+    rendered = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
+    print(rendered, end="")
+    if args.report:
+        args.report.write_text(rendered, encoding="utf-8")
+    return 0 if result["ok"] else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
