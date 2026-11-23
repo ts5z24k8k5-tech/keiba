@@ -222,3 +222,13 @@ A race absent from `races` is reported as missing. A supplied race can be struct
 - Audit flags explicitly record whether the private mapping is complete exactly once and whether unexpected progress/state conflicts were found. Invalid mapping or conflicting states stop report generation rather than producing a misleading summary.
 - Added synthetic tests for the consolidated counters and retry-race list. This is metadata validation only: it does not execute retries, inspect actual file bytes, download PDFs, or write to SQLite.
 - The integration source was reviewed and corrected after an edit left literal escaped newline characters in a Python statement; the current file has normal Python statements. The latest commit still requires a fresh GitHub Actions run before CI verification can be claimed.
+
+
+## Race-to-PDF manifest cross-audit (2026-11-23)
+- Added `scripts/jra_pdf_mapping_audit.py` and a local CLI to compare the per-race mapping CSV against the 23-row PDF manifest without network or database access.
+- The audit checks the 149-row/23-row inventory, unique race IDs and PDF URLs, exact race-ID set equality per PDF, declared target counts, official JRA HTTPS PDF URL policy, year/race-number identity encoded in race IDs, venue agreement, and race dates within each manifest PDF's date range.
+- Diagnostics are emitted as structured error codes. The report explicitly records that no network access, database modification, or promotion occurred.
+- Cross-check of the current private mapping and manifest: 149 mapping rows, 149 unique race IDs, 23 unique PDF URLs; the per-URL race-ID sets and counts match the manifest, with no venue/date/year/race-number discrepancies found.
+- Added synthetic tests for duplicate IDs, wrong race sets, venue/date mismatch, non-JRA URLs, missing columns, and CLI output. Latest GitHub Actions run #45119210052 completed successfully: **144 tests passed**.
+- This verifies the mapping metadata only. It does not prove that the 23 PDF files are currently downloadable, does not inspect PDF contents, and does not modify SQLite or models.
+- Example: `python -m scripts.jra_pdf_mapping_audit --mapping private_input/race_pdf_mapping_149.csv --manifest private_input/jra_official_pdf_manifest_23.csv --output output/jra_pdf_mapping_audit.json`.
