@@ -27,7 +27,7 @@ class IntegratedProgressTests(unittest.TestCase):
         self.assertEqual(races["202410010102"]["status"], "pdf_acquired")
         self.assertEqual(races["202410010103"]["status"], "blocked")
         self.assertEqual(report["race_ids_requiring_source_pdf"], ["202410010103"])
-        self.assertFalse(report["promotion_authorized"])
+        self.assertFalse(report["promotion_authorized"])\n        self.assertEqual(report["overall"]["expected_races"], 3)\n        self.assertEqual(report["overall"]["races_blocked"], 1)\n        self.assertEqual(report["overall"]["races_ready_for_segmentation"], 2)\n        self.assertEqual(report["pdf_batch_report"]["retry_race_ids"], ["202410010103"])
 
     def test_recovered_pdf_unblocks_its_races(self):
         data = payload()
@@ -70,7 +70,7 @@ class IntegratedProgressTests(unittest.TestCase):
         with self.assertRaisesRegex(IntegrationError, "unexpected race progress"):
             build_integrated_progress_report(data)
 
-    def test_cli_writes_integrated_report(self):
+    def test_consolidated_audit_counts_match_race_and_pdf_ledgers(self):\n        data = payload()\n        data["pdf_batches"][1] = {\n            "pdf_key": "pdf-b", "race_ids": ["202410010103"], "status": "pending", "attempt_count": 0\n        }\n        report = build_integrated_progress_report(data)\n        self.assertEqual(report["overall"]["pdf_assets"], 2)\n        self.assertEqual(report["overall"]["source_pdf_retry_required"], 2)\n        self.assertEqual(report["overall"]["races_pending"], 1)\n        self.assertTrue(report["audit_flags"]["mapping_complete_exactly_once"])\n\n    def test_cli_writes_integrated_report(self):
         with tempfile.TemporaryDirectory() as directory:
             source, target = Path(directory) / "input.json", Path(directory) / "out.json"
             source.write_text(json.dumps(payload()), encoding="utf-8")
