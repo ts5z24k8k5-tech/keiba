@@ -215,3 +215,10 @@ A race absent from `races` is reported as missing. A supplied race can be struct
 - Added 7 synthetic tests covering failed/pending PDF scope, recovery, incomplete mapping, conflicting stage state, unexpected race IDs, and CLI output.
 - No real mapping/status ledger has been run through this integration; no official PDF has been downloaded or parsed. Promotion remains disabled.
 - Example: `python -m scripts.build_jra_pdf_integrated_progress --input private_input/jra_pdf_integrated_progress.json --output output/jra_pdf_integrated_progress.json`.
+
+## Consolidated PDF/race audit report
+- The integrated progress report now includes one top-level `overall` section combining PDF asset count, expected race count, blocked/pending/segmentation-ready/reconciled race counts, and the number of PDF assets requiring retry.
+- The PDF section separately reports retryable PDF keys and the exact race IDs mapped to pending/failed source PDFs. The race section retains each race's next action.
+- Audit flags explicitly record whether the private mapping is complete exactly once and whether unexpected progress/state conflicts were found. Invalid mapping or conflicting states stop report generation rather than producing a misleading summary.
+- Added synthetic tests for the consolidated counters and retry-race list. This is metadata validation only: it does not execute retries, inspect actual file bytes, download PDFs, or write to SQLite.
+- The integration source was reviewed and corrected after an edit left literal escaped newline characters in a Python statement; the current file has normal Python statements. The latest commit still requires a fresh GitHub Actions run before CI verification can be claimed.
