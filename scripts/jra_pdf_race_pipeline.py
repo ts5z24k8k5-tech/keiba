@@ -100,3 +100,60 @@ def group_page_words(
 ) -> list[TextRow]:
     """Convenience wrapper for coordinate grouping; no semantic row filtering."""
     return group_words_into_rows(words, baseline_tolerance=baseline_tolerance)
+
+
+@dataclass(frozen=True)
+class RunnerRowBand:
+    """Operator-reviewed vertical interval expected to contain one runner row."""
+    y_min: float
+    y_max: float
+
+
+def select_runner_rows_from_page_words(
+    words: Iterable[PositionedWord],
+    row_bands: Sequence[RunnerRowBand],
+    *,
+    baseline_tolerance: float = 2.5,
+) -> list[TextRow]:
+    """Select rows only inside explicitly reviewed vertical intervals.
+
+    This intentionally does not auto-detect runner rows. Every configured
+    interval must contain exactly one geometric text row, and every supplied
+    non-empty word must belong to exactly one interval. Headers/footers should
+    be excluded by the caller's explicit page-region selection, not heuristics.
+    """
+    if not row_bands:
+        raise RaceExtractionError("at least one reviewed runner row band is required")
+    ordered = sorted(row_bands, key=lambda band: band.y_min)
+    previous_max = None
+    for band in ordered:
+        if band.y_max <= band.y_min:
+            raise RaceExtractionError("runner row band has invalid vertical bounds")
+        if previous_max is not None and band.y_min < previous_max:
+            raise RaceExtractionError("runner row bands overlap")
+        previous_max = band.y_max
+
+    buckets: list[list[PositionedWord]] = [[] for _ in ordered]
+    for word in words:
+        center = word.center_y
+        matches = [
+            index for index, band in enumerate(ordered)
+            if band.y_min <= center < band.y_max
+        ]
+        if len(matches) != 1:
+            raise RaceExtractionError(
+                f"word at y={center:.2f} is outside exactly one reviewed runner row band"
+            )
+        buckets[matches[0]].append(word)
+
+    selected: list[TextRow] = []
+    for index, bucket in enumerate(buckets):
+        if not bucket:
+            raise RaceExtractionError(f"reviewed runner row band {index} is empty")
+        grouped = group_words_into_rows(bucket, baseline_tolerance=baseline_tolerance)
+        if len(grouped) != 1:
+            raise RaceExtractionError(
+                f"reviewed runner row band {index} contains {len(grouped)} text rows; expected exactly one"
+            )
+        selected.append(grouped[0])
+    return selected
