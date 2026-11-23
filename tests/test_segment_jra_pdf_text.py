@@ -30,7 +30,7 @@ class StrictRaceSegmentationTests(unittest.TestCase):
         self.assertNotIn("第2競走", blocks[0].page_text)
 
     def test_accepts_full_width_digits(self):
-        text = "１１月３０日 晴 （２０２４年７京都） 第１日 第１競走\n本文"
+        text = "１１月３０日 晴 （２０９９年７京都） 第１日 第１競走\n本文"
         blocks = segment_expected_races([text], [self.expected()])
         self.assertEqual(blocks[0].race_date, "2099-11-30")
 
