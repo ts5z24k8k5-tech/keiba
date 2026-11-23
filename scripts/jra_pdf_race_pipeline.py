@@ -43,7 +43,7 @@ def build_race_candidates(
     reviewed row-selection rule. This function deliberately fails on any row
     that cannot be parsed; it never silently skips a row.
     """
-    if not re.fullmatch(r"20\\d{10}", race_id):
+    if not re.fullmatch(r"20\d{10}", race_id):
         raise RaceExtractionError("race_id must be a 12-digit target ID")
     if not re.fullmatch(r"[0-9a-fA-F]{64}", source_pdf_sha256):
         raise RaceExtractionError("source_pdf_sha256 must be a SHA-256 hex digest")
@@ -52,11 +52,15 @@ def build_race_candidates(
     if not rows:
         raise RaceExtractionError("no runner rows supplied")
 
+    bands = list(column_bands)
+    if not bands:
+        raise RaceExtractionError("at least one explicit column band is required")
+
     extracted: list[RunnerExtraction] = []
     candidates: list[RunnerCandidate] = []
     for index, row in enumerate(rows):
         try:
-            cells = split_row_into_columns(row, column_bands, reject_unassigned=True)
+            cells = split_row_into_columns(row, bands, reject_unassigned=True)
             fields = parse_runner_cells(cells)
         except (ValueError, TypeError) as exc:
             raise RaceExtractionError(f"runner row {index} could not be parsed: {exc}") from exc
