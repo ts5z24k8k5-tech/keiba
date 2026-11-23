@@ -41,3 +41,15 @@ and records byte counts and SHA-256 hashes. The output is published as a
 - A successful download does not establish that extracted rows are correct.
   PDF parsing, race-ID/horse-ID matching, and staged database validation remain
   separate steps.
+
+## Parser acceptance boundary
+
+The research branch also contains `scripts/segment_jra_pdf_text.py`, a strict
+race-block segmenter. It accepts a block only when the official heading's date,
+venue and race number match the reviewed target mapping. It does not parse
+runner rows, resolve horse IDs, or write to SQLite.
+
+See `docs/JRA_PDF_PARSER_ACCEPTANCE.md` for runner-field provenance,
+non-finisher handling, staging requirements and the acceptance gates before
+any database promotion. The PR test workflow runs both downloader and
+segmentation unit tests on updates to this isolated research branch.
