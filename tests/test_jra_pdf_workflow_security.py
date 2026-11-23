@@ -44,6 +44,29 @@ class WorkflowSecurityPolicyTests(unittest.TestCase):
         self.assertNotIn("git push || true", source)
         self.assertNotIn("git commit -m", source.split("if: success()", 1)[0])
 
+    def test_local_inputs_and_generated_outputs_are_gitignored(self) -> None:
+        ignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
+        for pattern in (
+            "private_input/",
+            "output/",
+            ".env",
+            ".env.*",
+            "*.pem",
+            "*.key",
+            "*.sqlite",
+            "*.sqlite3",
+            "*.db",
+            "*.parquet",
+            "*.pkl",
+            "*.joblib",
+            "*.onnx",
+            "*.pt",
+            "*.pth",
+            "*.h5",
+        ):
+            with self.subTest(pattern=pattern):
+                self.assertIn(pattern, ignore)
+
     def test_pdf_artifact_not_uploaded_on_failed_acquisition(self) -> None:
         source = self._read("research-acquire-jra-pdfs.yml")
         upload = source.index("uses: actions/upload-artifact@v4")
