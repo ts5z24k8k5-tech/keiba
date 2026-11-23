@@ -106,3 +106,9 @@ Keep, at minimum:
 - Differences are classified as `mismatch`, `missing_extracted`, or `missing_reference`. Null on both sides is treated as no difference; this does not prove the field was independently verified.
 - Missing keys, duplicate/empty field lists, unrequested tolerances, invalid numeric values, and negative tolerances fail closed.
 - Added 9 synthetic tests. No actual official reference dataset has been loaded, and no 149-race reconciliation has been run. The comparator does not promote data or write to SQLite.
+
+
+## CI follow-up for reconciliation addition
+- The first PR CI run after adding the comparator executed 67 tests but failed to import `test_jra_pdf_race_pipeline.py` because a prior edit had left literal backslash-n sequences in its import statement.
+- Corrected that test import in commit `4691a426d61d1bd89a47753a77f7dad924a5e7e1`.
+- A new workflow run has not yet been returned for the correction; the suite is therefore pending re-verification. The 9 reconciliation tests did pass in the failed run, but the overall suite did not.
