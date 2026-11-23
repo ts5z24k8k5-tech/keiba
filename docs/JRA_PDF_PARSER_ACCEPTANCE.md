@@ -199,3 +199,9 @@ A race absent from `races` is reported as missing. A supplied race can be struct
 - Added 7 synthetic tests for valid reuse, repeated resume runs, and fail-closed cases. CI status for this latest addition is pending.
 - Usage: `python -m scripts.download_jra_pdfs --manifest private_input/jra_official_pdf_manifest.csv --out output/jra_pdfs --resume`.
 - Resume only trusts the local audit as a pointer to the expected hash; the actual file bytes are rehashed each time. No remote download, real PDF verification, SQLite write, or model promotion has been performed by this change.
+
+## PDF batch integrity ledger
+- The private PDF batch ledger records a per-PDF attempt count and a stable failure code for failed acquisitions. Acquired/validated entries must also carry a lowercase 64-character SHA-256 and a byte count of at least 1,024; entries missing either value are rejected.
+- The local batch report emits these integrity fields alongside the race-ID mapping and retry list. Only pending/failed batches are retry candidates; successful batches are not selected for retry.
+- The ledger validates metadata consistency but does not itself hash local files or trigger network retries. The downloader's resume path independently recomputes file size and SHA-256 before reusing a prior PDF.
+- Synthetic tests cover invalid hashes/sizes and report serialization. No real PDF has been downloaded in this workflow, so no real-file digest has yet been recorded here.
