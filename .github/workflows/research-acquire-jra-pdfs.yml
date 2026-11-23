@@ -24,6 +24,8 @@ jobs:
           test -n "$MANIFEST_B64" || { echo "Missing JRA_PDF_MANIFEST_B64 secret"; exit 2; }
           mkdir -p private_input
           printf '%s' "$MANIFEST_B64" | base64 --decode > private_input/jra_official_pdf_manifest_23.csv
+      - name: Run downloader unit tests
+        run: python -m unittest discover -s tests -p 'test_download_jra_pdfs.py' -v
       - name: Validate and download official PDFs
         run: |
           python scripts/download_jra_pdfs.py \
