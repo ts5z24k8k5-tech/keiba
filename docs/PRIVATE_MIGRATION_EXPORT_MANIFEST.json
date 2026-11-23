@@ -3,7 +3,7 @@
   "source": {
     "repository": "ts5z24k8k5-tech/keiba",
     "ref": "research/jra-pdf-acquisition-20261123",
-    "commit": "84be0feeec0db8fb569187c0b8197293bcb26f98"
+    "commit": "720b96c008ca22db1682927421773808986c9beb"
   },
   "policy": "Exact-path clean-history export; only entries with export=true are permitted. SHA-256 must be populated from trusted exported bytes before validation.",
   "entries": [
@@ -27,8 +27,8 @@
       "path": "docs/JRA_PDF_PARSER_ACCEPTANCE.md",
       "source_git_blob_sha1": "9e6db9c3e6c875ccfcd2af5baf26e197e0a3ae7a",
       "source_bytes": 23308,
-      "status": "ALLOW_CANDIDATE",
-      "export": true,
+      "status": "REWRITE_REQUIRED",
+      "export": false,
       "expected_sha256": null
     },
     {
@@ -73,8 +73,8 @@
     },
     {
       "path": "scripts/download_jra_pdfs.py",
-      "source_git_blob_sha1": "644ecce0b053b9b8bd681c38ea70e5ea3e19035d",
-      "source_bytes": 11932,
+      "source_git_blob_sha1": "de842005cf1abb923cf8f1763b4b8f38867c89dc",
+      "source_bytes": 12019,
       "status": "ALLOW_CANDIDATE",
       "export": true,
       "expected_sha256": null
@@ -113,8 +113,8 @@
     },
     {
       "path": "scripts/jra_pdf_mapping_audit.py",
-      "source_git_blob_sha1": "1a533aca1b0153d4450d47d5cca91bd46988a1d2",
-      "source_bytes": 9691,
+      "source_git_blob_sha1": "6a43c2727f2d5b0fa7023af0bf45ab95c6f06ace",
+      "source_bytes": 9906,
       "status": "ALLOW_CANDIDATE",
       "export": true,
       "expected_sha256": null
@@ -185,7 +185,7 @@
     },
     {
       "path": "tests/test_build_jra_pdf_audit_report.py",
-      "source_git_blob_sha1": "e664d8c2e40e476693e0a8540b411938e4e22c95",
+      "source_git_blob_sha1": "aa803cc410685a3391500a27323b0aec471406cc",
       "source_bytes": 4410,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -193,7 +193,7 @@
     },
     {
       "path": "tests/test_build_jra_pdf_batch_report.py",
-      "source_git_blob_sha1": "083fbddf30bf448fc1eab4ca9e6bd96d618dffa8",
+      "source_git_blob_sha1": "de81f9db11fafdf942eb914d47b6307672863c61",
       "source_bytes": 1996,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -201,7 +201,7 @@
     },
     {
       "path": "tests/test_build_jra_pdf_progress_report.py",
-      "source_git_blob_sha1": "e119b21fdf3cd22ba42cd026f6a738470a672fb4",
+      "source_git_blob_sha1": "36908c216828e6da63f0ae260ebf9de926db3c30",
       "source_bytes": 1997,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -209,7 +209,7 @@
     },
     {
       "path": "tests/test_download_jra_pdfs.py",
-      "source_git_blob_sha1": "e97b51f664f79c40e0ed460df305287fac1cd46e",
+      "source_git_blob_sha1": "f55c3aff69f1e14a79ba51d8b5b26934034487c2",
       "source_bytes": 5785,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -225,7 +225,7 @@
     },
     {
       "path": "tests/test_jra_pdf_batch_progress.py",
-      "source_git_blob_sha1": "6da0136c1829a5fe52c56c810a987d9d33e86b8b",
+      "source_git_blob_sha1": "475c797a25c729add711ccca747db385601607e8",
       "source_bytes": 3903,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -249,7 +249,7 @@
     },
     {
       "path": "tests/test_jra_pdf_mapping_audit.py",
-      "source_git_blob_sha1": "53da242c1923e198a51a23b74fffb0acc3b0fd38",
+      "source_git_blob_sha1": "2978e6f9de927d29801ef486e1813966b64253e1",
       "source_bytes": 4655,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -257,7 +257,7 @@
     },
     {
       "path": "tests/test_jra_pdf_progress.py",
-      "source_git_blob_sha1": "f38155db57e350a220566858e4374572b85d8c61",
+      "source_git_blob_sha1": "f3c8f24aa2be388746dc67031a5731ef63c21cf5",
       "source_bytes": 2707,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -265,7 +265,7 @@
     },
     {
       "path": "tests/test_jra_pdf_progress_integration.py",
-      "source_git_blob_sha1": "296023ec17bedbb55f5e9a9ca2defc027f76aa9f",
+      "source_git_blob_sha1": "981af98f09a26198c8973251fbf0a3035ffcb21b",
       "source_bytes": 4863,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -273,7 +273,7 @@
     },
     {
       "path": "tests/test_jra_pdf_race_audit.py",
-      "source_git_blob_sha1": "00b6770fb74547961ec8917fad3802a1d8f7689f",
+      "source_git_blob_sha1": "7a798279f3ad43757739e4bcb1326bce8bd0748b",
       "source_bytes": 3883,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -281,7 +281,7 @@
     },
     {
       "path": "tests/test_jra_pdf_race_pipeline.py",
-      "source_git_blob_sha1": "8bb76d7f5972b8c4d7c48461e0b0855b97daf190",
+      "source_git_blob_sha1": "75a8bee1dd3c1443b40b9e8c5193ac3a72197082",
       "source_bytes": 3465,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -289,7 +289,7 @@
     },
     {
       "path": "tests/test_jra_pdf_reconciliation.py",
-      "source_git_blob_sha1": "00609d07ef36914c89b043d2bdb6d9b799047a7f",
+      "source_git_blob_sha1": "73019af70181017c80ab1a9bd65d6ceecfa9fbc7",
       "source_bytes": 2467,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -297,7 +297,7 @@
     },
     {
       "path": "tests/test_jra_pdf_resume.py",
-      "source_git_blob_sha1": "566d4807ea9429c5e0cdb3eb337f20559ade6f83",
+      "source_git_blob_sha1": "579a505deec0b3be988870e51fca5d3701fe8605",
       "source_bytes": 4050,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -313,7 +313,7 @@
     },
     {
       "path": "tests/test_jra_pdf_runner_validation.py",
-      "source_git_blob_sha1": "cb4a6a145700ec931d9cb8084882fddfaedfd04d",
+      "source_git_blob_sha1": "314ce9f2a29ca1b9f91252c78e8ab914df663fd8",
       "source_bytes": 3287,
       "status": "ALLOW_CANDIDATE",
       "export": true,
@@ -323,13 +323,13 @@
       "path": "tests/test_jra_pdf_workflow_security.py",
       "source_git_blob_sha1": "ecf621899349190f59b0a1e8ee439d7c4a9f41f5",
       "source_bytes": 3225,
-      "status": "ALLOW_CANDIDATE",
-      "export": true,
+      "status": "REWRITE_REQUIRED",
+      "export": false,
       "expected_sha256": null
     },
     {
       "path": "tests/test_segment_jra_pdf_text.py",
-      "source_git_blob_sha1": "7a3c2ed3f60ff789d0ecb76a6db1d06c5890442c",
+      "source_git_blob_sha1": "d80ef31e449859e821840b77ed1ccee4c56a7886",
       "source_bytes": 3152,
       "status": "ALLOW_CANDIDATE",
       "export": true,
