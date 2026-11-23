@@ -5,7 +5,7 @@ write to the repository, the historical SQLite database, or any model.
 
 ## Important: this repository is a public fork
 
-This repository is a public fork, so GitHub does not allow its visibility to be changed to private independently. Do not try to run this workflow here. Create a private standalone repository or deliberately detach this fork from its network first. Current GitHub metadata reports 647 KB and zero child forks, which appears to meet GitHub's documented conditions for the manual **Leave network** option; detachment is permanent and should be reviewed before proceeding. A private standalone repository must contain only reviewed source code and must keep private manifests/data out of public history.
+This repository is a public fork, so GitHub does not allow its visibility to be changed to private independently. Do not try to run this workflow here. Create a private standalone repository or deliberately detach this fork from its network first. The latest preflight metadata reports 702 KB and zero child forks, which appears to meet GitHub's documented conditions for the manual **Leave network** option; re-check these conditions at decision time. Detachment is permanent and should be reviewed before proceeding. A private standalone repository must contain only reviewed source code and must keep private manifests/data out of public history. Before the first Git mirror push into the new repository, disable GitHub Actions there: the copied `main` still contains an older push-triggered odds workflow. Keep Actions disabled until the private default branch has been reviewed and hardened.
 
 ## Required private secret
 
