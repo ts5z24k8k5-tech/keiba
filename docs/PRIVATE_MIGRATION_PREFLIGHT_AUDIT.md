@@ -140,3 +140,19 @@ A regression test checks these ignore rules. This prevents accidental staging of
 - If refs, commit counts, or object integrity do not match, stop before opening a private PR or enabling workflows.
 
 This document is a migration preflight audit, not authorization to execute the migration.
+
+
+## Live correction — 2026-11-23 16:27 JST
+
+This section supersedes the earlier point-in-time values in sections 1 and 3 where they describe branch head, PR size, and Actions run totals. The earlier source snapshot `8f6ab159...` remains a valid historical snapshot, not the current branch head.
+
+- `main` remains `6ec783499b8e3b77274e59fb251936d90a231d8d`.
+- Research branch at this correction snapshot: `277e4ce4da644067e29f56788021a4d358de55db`.
+- PR #1: Open / Draft / unmerged; 141 commits, 47 changed files, +4,603 / -16. The issue-comment endpoint and review endpoint each returned zero entries at this check.
+- Actions inventory: 212 returned runs over three pages; 208 PDF research-test runs, 3 PDF-acquisition workflow attempts, and 1 early PDF-test run. Conclusions: 142 success, 70 failure. No historical-data collection or odds-capture run appeared in the returned inventory.
+- Latest PR run inspected at this snapshot: `45131277893`, unit-tests succeeded; artifact list empty.
+- Current `main` workflow source was fetched again. `collect-jra.yml` still has a manual trigger and `if: always()` artifact upload for SQLite, training/validation/test CSVs, audit data, summary and log. `fetch-current-odds.yml` still has selected-path push trigger, `contents: write`, `if: always()` artifact upload, and snapshot commit/push steps. Neither has the private-repository guard currently present on the research branch.
+- Branch metadata still reports both `main` and the research branch as unprotected. The earlier ruleset query returned no rulesets. The destination private repository must be configured explicitly; do not assume mirror migration carries branch rules.
+- GitHub currently reports the public fork as 702 KB, fork=true, zero child forks, parent `yuhevita-wq/keiba`.
+
+The run inventory and artifact checks are bounded by currently returned API records. They do not prove that expired, deleted, or otherwise unavailable historical artifacts never existed. Do not run data collection, odds capture, or PDF acquisition in the public fork.
