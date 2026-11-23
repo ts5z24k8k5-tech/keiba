@@ -36,7 +36,7 @@ def build_report(payload: Any) -> dict[str, object]:
             raise PdfBatchProgressError(f"{label}.race_ids must be a string array")
         batches.append(PdfBatch(
             item["pdf_key"], tuple(item["race_ids"]), item["status"],
-            item["attempt_count"], item.get("failure_code"),
+            item["attempt_count"], item.get("failure_code"), item.get("sha256"), item.get("byte_count"),
         ))
     summary = build_pdf_batch_summary(expected, batches)
     return pdf_batch_summary_to_dict(summary)
