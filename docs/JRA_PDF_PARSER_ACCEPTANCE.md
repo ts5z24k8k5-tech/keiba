@@ -196,6 +196,6 @@ A race absent from `races` is reported as missing. A supplied race can be struct
 - Added `--resume` to `scripts/download_jra_pdfs.py`. It consults the previous local `download_audit.csv` and reuses a PDF only if the URL and filename match, the previous row was successful, and the existing file still matches the recorded byte count, PDF signature, and SHA-256.
 - Duplicate URL entries in the old audit are treated as ambiguous and are not trusted. Missing, changed, truncated, or mismatched files fall back to the normal download path.
 - Reused items are marked `already_verified`; the summary separately reports `pdf_files_reused_verified`. This does not claim a new HTTP fetch occurred.
-- Added 6 synthetic tests for valid reuse and fail-closed cases. CI status for this latest addition is pending.
+- Added 7 synthetic tests for valid reuse, repeated resume runs, and fail-closed cases. CI status for this latest addition is pending.
 - Usage: `python -m scripts.download_jra_pdfs --manifest private_input/jra_official_pdf_manifest.csv --out output/jra_pdfs --resume`.
 - Resume only trusts the local audit as a pointer to the expected hash; the actual file bytes are rehashed each time. No remote download, real PDF verification, SQLite write, or model promotion has been performed by this change.
