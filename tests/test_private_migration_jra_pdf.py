@@ -70,6 +70,26 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
         after = sorted(p.relative_to(self.export).as_posix() for p in self.export.rglob("*"))
         self.assertEqual(before, after)
 
+    def test_cli_writes_machine_readable_failure_report_for_invalid_export(self):
+        (self.export / "scripts/example.py").write_bytes(b"tampered synthetic content")
+        report = self.base / "reports" / "failed-validation.json"
+        report.parent.mkdir()
+        completed = self.run_cli("--report", report)
+        self.assertEqual(completed.returncode, 1)
+        stdout_result = json.loads(completed.stdout)
+        report_result = json.loads(report.read_text(encoding="utf-8"))
+        self.assertFalse(stdout_result["ok"])
+        self.assertEqual(stdout_result, report_result)
+        self.assertTrue(any(x.startswith("SHA256_MISMATCH:") for x in report_result["findings"]))
+
+    def test_cli_returns_json_and_nonzero_for_malformed_manifest(self):
+        self.manifest_path.write_text("{", encoding="utf-8")
+        completed = self.run_cli()
+        self.assertEqual(completed.returncode, 1)
+        result = json.loads(completed.stdout)
+        self.assertFalse(result["ok"])
+        self.assertTrue(any(x.startswith("MANIFEST_OR_INPUT_ERROR:") for x in result["findings"]))
+
     def test_cli_refuses_report_inside_export_without_creating_it(self):
         report = self.export / "validation.json"
         completed = self.run_cli("--report", report)
