@@ -20,10 +20,11 @@ FORBIDDEN_PARTS = {
     "data", "datasets", "snapshots", "models", "logs", "cache", "__pycache__",
     ".git",
 }
-FORBIDDEN_SUFFIXES = {
+FORBIDDEN_SUFFIXES = (
     ".pdf", ".sqlite", ".sqlite3", ".db", ".parquet", ".pkl", ".pickle",
-    ".joblib", ".onnx", ".pt", ".pth", ".h5", ".csv",
-}
+    ".joblib", ".onnx", ".pt", ".pth", ".h5", ".csv", ".json",
+)
+ALLOWED_SOURCE_SUFFIXES = {".py", ".md", ".yml"}
 FORBIDDEN_NAMES = {
     ".env", ".env.local", ".env.production", "id_rsa", "id_ed25519",
     "credentials", "secrets.json",
@@ -85,6 +86,8 @@ def forbidden_reason(rel: str) -> str | None:
         return "credential/environment file"
     if name.endswith(FORBIDDEN_SUFFIXES):
         return "excluded data/binary file type"
+    if Path(name).suffix.lower() not in ALLOWED_SOURCE_SUFFIXES and name != ".gitignore":
+        return "file type is outside the source-only export policy"
     if name.endswith((".pem", ".key", ".p12", ".pfx")):
         return "credential/key material"
     return None
