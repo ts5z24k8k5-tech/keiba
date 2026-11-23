@@ -70,6 +70,13 @@ class MappingAuditTests(unittest.TestCase):
         with self.assertRaises(MappingAuditError):
             audit_race_pdf_mapping([{"race_id": "1"}], [{"pdf_url": "x"}], 1, 1)
 
+    def test_missing_required_column_is_detected_even_with_extra_columns(self):
+        mapping, manifest = fixtures()
+        mapping[0].pop("race_no")
+        mapping[0]["extra"] = "value"
+        with self.assertRaisesRegex(MappingAuditError, "mapping missing columns"):
+            audit_race_pdf_mapping(mapping, manifest, 3, 2)
+
     def test_cli_writes_report_and_returns_success(self):
         mapping, manifest = fixtures()
         with tempfile.TemporaryDirectory() as directory:
