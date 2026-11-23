@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Callable
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 REQUIRED = {
     "pdf_url", "year", "venue", "date_start", "date_end",
@@ -87,12 +87,24 @@ def validate_manifest(path: Path, expected_races: int = 149) -> list[dict[str, s
     return rows
 
 
+class JRAOnlyRedirectHandler(HTTPRedirectHandler):
+    """Reject non-HTTPS or non-JRA redirects before following them."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        target = urlparse(newurl)
+        if target.scheme != "https" or target.hostname not in ALLOWED_HOSTS:
+            raise ValueError(f"blocked redirect outside official JRA HTTPS hosts: {newurl}")
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
 def _fetch(url: str, timeout: int) -> tuple[bytes, int, str, str]:
+    source = urlparse(url)
+    if source.scheme != "https" or source.hostname not in ALLOWED_HOSTS:
+        raise ValueError("source URL must use HTTPS on an official JRA host")
     req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/pdf,*/*;q=0.8"})
-    with urlopen(req, timeout=timeout) as response:
+    opener = build_opener(JRAOnlyRedirectHandler())
+    with opener.open(req, timeout=timeout) as response:
         final_url = response.geturl()
-        if urlparse(final_url).hostname not in ALLOWED_HOSTS:
-            raise ValueError(f"redirected outside JRA host: {final_url}")
         body = response.read()
         return body, int(response.status), response.headers.get("Content-Type", ""), final_url
 
