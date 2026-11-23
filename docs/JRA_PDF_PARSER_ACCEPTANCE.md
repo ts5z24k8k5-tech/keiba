@@ -120,3 +120,12 @@ Keep, at minimum:
 - Exposes separate `structurally_complete` and `fully_reconciled` flags. Structural completeness alone is not proof of correctness. Full reconciliation requires a report for every expected horse number and zero differences in every report.
 - Added 10 synthetic tests, including invalid identity and incomplete comparison cases.
 - The latest commit has no reported Actions run yet. Tests are not claimed as CI-verified. No actual JRA PDF or independent official reference dataset has been processed; no database writes or promotion logic exist.
+
+
+## Local aggregate audit CLI (synthetic only)
+- Added `scripts/build_jra_pdf_audit_report.py` to load a private JSON staging file, validate its schema, and produce a compact aggregate JSON quality report using the race-audit module.
+- Input requires the expected race-ID inventory plus per-race expected field size, extracted horse numbers, and per-runner reconciliation reports. IDs must be 12-digit strings; unknown keys, duplicate lists, malformed statuses, and invalid data types fail closed.
+- The CLI writes only the requested report file and does not modify its input, PDFs, SQLite, or model files. The staging JSON and report belong in ignored local paths such as `private_input/` and `output/`; never commit them.
+- Added 7 synthetic tests for report contents, complete/incomplete reconciliation, strict schema failures, and input immutability.
+- This is an orchestration/serialization layer only. No private staging data has been supplied to it, no original PDF has been acquired, and no actual JRA race has been audited. New tests are pending CI verification.
+- Example (run locally after preparing the private staging JSON): `python -m scripts.build_jra_pdf_audit_report --input private_input/jra_pdf_staging.json --output output/jra_pdf_audit.json`.
