@@ -87,7 +87,9 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
             "expected_sha256": None,
         }
         self.write_manifest([entry])
-        self.assertTrue(any(x.startswith("SHA256_UNPINNED:") for x in self.result()["findings"]))
+        result = self.result()
+        self.assertTrue(any(x.startswith(f"SHA256_UNPINNED: scripts/example.py: actual={self.digest}") for x in result["findings"]))
+        self.assertEqual(result["sha256_checked"], 1)
 
     def test_rejects_duplicate_manifest_paths(self):
         entry = {
@@ -105,6 +107,23 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
         }
         self.write_manifest([entry])
         with self.assertRaisesRegex(ValueError, "unsafe"):
+            self.result()
+
+    def test_rejects_windows_drive_and_case_colliding_paths(self):
+        entry = {
+            "path": "C:/outside.py", "source_git_blob_sha1": "b" * 40,
+            "source_bytes": 1, "export": True, "expected_sha256": self.digest,
+        }
+        self.write_manifest([entry])
+        with self.assertRaisesRegex(ValueError, "unsafe"):
+            self.result()
+        upper = {
+            "path": "Scripts/example.py", "source_git_blob_sha1": "b" * 40,
+            "source_bytes": len(self.body), "export": True, "expected_sha256": self.digest,
+        }
+        lower = dict(upper, path="scripts/example.py")
+        self.write_manifest([upper, lower])
+        with self.assertRaisesRegex(ValueError, "case-colliding"):
             self.result()
 
     def test_rejects_symlink(self):
