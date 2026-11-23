@@ -55,7 +55,7 @@ class ExplicitColumnAssignmentTests(unittest.TestCase):
             validate_column_bands([ColumnBand("zero", 10, 10)])
 
     def test_rejects_words_in_unconfigured_gaps(self):
-        word = PositionedWord(25, 10, 35, 20, "境界")
+        word = PositionedWord(20, 10, 24, 20, "境界")
         with self.assertRaisesRegex(ColumnAssignmentError, "exactly one"):
             assign_word_to_column(word, self.bands)
 
