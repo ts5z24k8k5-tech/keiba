@@ -100,7 +100,7 @@ def load_audit_payload(payload: Any) -> tuple[tuple[str, ...], tuple[RaceAuditIn
             if not isinstance(horse_no, int) or isinstance(horse_no, bool):
                 raise AuditInputError(f"{report_label}.horse_no must be an integer")
             compared_fields = report["compared_fields"]
-            if not isinstance(compared_fields, list) or any(
+            if not isinstance(compared_fields, list) or not compared_fields or any(
                 not isinstance(field, str) or not field for field in compared_fields
             ):
                 raise AuditInputError(f"{report_label}.compared_fields must be a string array")
@@ -119,7 +119,7 @@ def load_audit_payload(payload: Any) -> tuple[tuple[str, ...], tuple[RaceAuditIn
                     raise AuditInputError(f"{diff_label}.field must be a non-empty string")
                 if diff["field"] not in compared_fields:
                     raise AuditInputError(f"{diff_label}.field is not in compared_fields")
-                if diff["status"] not in DIFFERENCE_STATUSES:
+                if not isinstance(diff["status"], str) or diff["status"] not in DIFFERENCE_STATUSES:
                     raise AuditInputError(f"{diff_label}.status is invalid")
                 differences.append(
                     FieldDifference(
