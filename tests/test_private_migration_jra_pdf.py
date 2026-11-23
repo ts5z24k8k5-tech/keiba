@@ -118,9 +118,22 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
 
     def test_rejects_empty_or_malformed_manifest(self):
         self.manifest_path.write_text("{", encoding="utf-8")
-        result = self.result()
-        self.assertFalse(result["ok"])
-        self.assertTrue(result["findings"][0].startswith("MANIFEST_OR_INPUT_ERROR:"))
+        with self.assertRaisesRegex(ValueError, "cannot read manifest"):
+            self.result()
+
+    def test_rejects_unapproved_json_even_when_added_to_manifest(self):
+        body = b"synthetic-json"
+        self.write_export("docs/extra.json", body)
+        entries = [{
+            "path": "scripts/example.py", "source_git_blob_sha1": "b" * 40,
+            "source_bytes": len(self.body), "export": True, "expected_sha256": self.digest,
+        }, {
+            "path": "docs/extra.json", "source_git_blob_sha1": "c" * 40,
+            "source_bytes": len(body), "export": True,
+            "expected_sha256": hashlib.sha256(body).hexdigest(),
+        }]
+        self.write_manifest(entries)
+        self.assertTrue(any(x.startswith("EXCLUDED_PATH: docs/extra.json") for x in self.result()["findings"]))
 
 
 if __name__ == "__main__":
