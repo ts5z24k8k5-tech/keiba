@@ -58,7 +58,7 @@ def validate_manifest(data: object) -> tuple[dict[str, dict], list[str]]:
         if pure.is_absolute() or PureWindowsPath(path).drive or any(part in ("", ".", "..") for part in path.split("/")) or any(ord(ch) < 32 for ch in path):
             raise fail(f"entries[{index}].path is unsafe: {path!r}")
         if path in seen or path.casefold() in seen_casefold:
-            raise fail(f"duplicate or case-colliding manifest path: {path}")
+            raise fail(f"duplicate manifest path or case-colliding path: {path}")
         seen.add(path)
         seen_casefold.add(path.casefold())
         if not SHA1_RE.fullmatch(str(item.get("source_git_blob_sha1", ""))):
