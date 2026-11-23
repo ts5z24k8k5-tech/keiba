@@ -81,7 +81,8 @@ class IntegratedProgressTests(unittest.TestCase):
         }
         report = build_integrated_progress_report(data)
         self.assertEqual(report["overall"]["pdf_assets"], 2)
-        self.assertEqual(report["overall"]["source_pdf_retry_required"], 2)
+        self.assertEqual(report["overall"]["pdf_assets_retry_required"], 1)
+        self.assertEqual(report["overall"]["source_pdf_retry_required"], 1)
         self.assertEqual(report["overall"]["races_pending"], 1)
         self.assertTrue(report["audit_flags"]["mapping_complete_exactly_once"])
 
