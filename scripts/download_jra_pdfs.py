@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 import random
+import re
 import sys
 import time
 from dataclasses import asdict, dataclass
@@ -164,6 +165,69 @@ def download_one(row: dict[str, str], out_dir: Path, timeout: int = 30,
     return Result(url, filename, "failed", error=last_error)
 
 
+def load_prior_download_audit(out_dir: Path) -> dict[str, dict[str, str]]:
+    """Load only unambiguous successful rows from a previous local audit."""
+    audit_path = out_dir / "download_audit.csv"
+    if not audit_path.is_file():
+        return {}
+    try:
+        with audit_path.open("r", encoding="utf-8", newline="") as f:
+            rows = list(csv.DictReader(f))
+    except (OSError, csv.Error, UnicodeError):
+        return {}
+    verified: dict[str, dict[str, str]] = {}
+    ambiguous: set[str] = set()
+    for row in rows:
+        url = (row.get("pdf_url") or "").strip()
+        digest = (row.get("sha256") or "").strip().lower()
+        if not url or row.get("status") != "downloaded":
+            continue
+        if url in verified:
+            ambiguous.add(url)
+            verified.pop(url, None)
+            continue
+        if url in ambiguous:
+            continue
+        if not re.fullmatch(r"[0-9a-f]{64}", digest):
+            continue
+        try:
+            byte_count = int(row.get("bytes") or "0")
+        except ValueError:
+            continue
+        if byte_count < 1024:
+            continue
+        verified[url] = row
+    return verified
+
+
+def reuse_verified_pdf(row: dict[str, str], out_dir: Path,
+                       prior: dict[str, dict[str, str]]) -> Result | None:
+    """Reuse a local PDF only when prior audit identity, size, signature and SHA match."""
+    url = row["pdf_url"].strip()
+    filename = Path(urlparse(url).path).name
+    previous = prior.get(url)
+    if not previous or previous.get("filename") != filename:
+        return None
+    target = out_dir / filename
+    try:
+        if not target.is_file():
+            return None
+        body = target.read_bytes()
+    except OSError:
+        return None
+    digest = hashlib.sha256(body).hexdigest()
+    try:
+        expected_bytes = int(previous.get("bytes") or "0")
+    except ValueError:
+        return None
+    if (not body.startswith(b"%PDF-") or len(body) < 1024
+            or len(body) != expected_bytes
+            or digest != (previous.get("sha256") or "").lower()):
+        return None
+    return Result(url, filename, "already_verified", previous.get("http_status") and int(previous["http_status"]),
+                  len(body), digest, previous.get("content_type"), None)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--manifest", required=True, type=Path)
@@ -173,6 +237,8 @@ def main() -> int:
     ap.add_argument("--timeout", type=int, default=30)
     ap.add_argument("--retries", type=int, default=3)
     ap.add_argument("--delay", type=float, default=1.0, help="seconds between PDFs")
+    ap.add_argument("--resume", action="store_true",
+                    help="reuse only local PDFs whose prior audit SHA-256 and size still match")
     args = ap.parse_args()
 
     try:
@@ -182,8 +248,11 @@ def main() -> int:
         return 2
 
     results: list[Result] = []
+    prior_audit = load_prior_download_audit(args.out) if args.resume else {}
     for i, row in enumerate(rows):
-        result = download_one(row, args.out, args.timeout, args.retries)
+        result = reuse_verified_pdf(row, args.out, prior_audit) if args.resume else None
+        if result is None:
+            result = download_one(row, args.out, args.timeout, args.retries)
         results.append(result)
         print(f"[{i+1}/{len(rows)}] {result.status}: {result.filename}"
               + (f" ({result.bytes} bytes)" if result.status == "downloaded" else f" — {result.error}"))
@@ -199,7 +268,9 @@ def main() -> int:
     summary = {
         "manifest": str(args.manifest), "pdf_files_expected": len(rows),
         "pdf_files_downloaded": sum(x.status == "downloaded" for x in results),
+        "pdf_files_reused_verified": sum(x.status == "already_verified" for x in results),
         "pdf_files_failed": sum(x.status == "failed" for x in results),
+        "resume_enabled": args.resume,
         "target_races": args.expected_races,
         "database_modified": False,
         "results": [asdict(x) for x in results],
