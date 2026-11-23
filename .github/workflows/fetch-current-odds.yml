@@ -35,9 +35,11 @@ jobs:
         with:
           name: 20261018-akikasho-all-pool-odds
           retention-days: 7
-          path: results/live_odds/
+          path: |
+            results/live_odds/all_pools_snapshot.json
+            results/live_odds/snapshot_audit.json
           if-no-files-found: warn
-      - name: Save public market snapshot in repository
+      - name: Save private research snapshot in repository
         if: success()
         shell: bash
         run: |
