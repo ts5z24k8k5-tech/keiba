@@ -22,7 +22,12 @@ class PdfBatchReportCliTests(unittest.TestCase):
         self.assertEqual(report["retry_pdf_keys"], ["pdf-b"])
         self.assertEqual(report["covered_race_count"], 2)
 
-    def test_reports_hash_and_size_for_acquired_pdf(self):\n        report = build_report(payload())\n        self.assertEqual(report["batches"][0]["sha256"], "a" * 64)\n        self.assertEqual(report["batches"][0]["byte_count"], 2048)\n\n    def test_rejects_unknown_root_key(self):
+    def test_reports_hash_and_size_for_acquired_pdf(self):
+        report = build_report(payload())
+        self.assertEqual(report["batches"][0]["sha256"], "a" * 64)
+        self.assertEqual(report["batches"][0]["byte_count"], 2048)
+
+    def test_rejects_unknown_root_key(self):
         data = payload()
         data["extra"] = True
         with self.assertRaisesRegex(PdfBatchProgressError, "exactly"):
