@@ -1,10 +1,15 @@
 import hashlib
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 from scripts.validate_private_migration_export import validate_export
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+VALIDATOR = REPO_ROOT / "scripts" / "validate_private_migration_export.py"
 
 
 class PrivateMigrationExportValidationTests(unittest.TestCase):
@@ -43,6 +48,52 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
 
     def result(self):
         return validate_export(self.export, self.manifest_path)
+
+
+    def run_cli(self, *extra):
+        return subprocess.run(
+            [sys.executable, str(VALIDATOR), "--export-dir", str(self.export),
+             "--manifest", str(self.manifest_path), *map(str, extra)],
+            cwd=REPO_ROOT, capture_output=True, text=True, check=False,
+        )
+
+    def test_cli_success_and_json_report_are_valid_and_outside_export(self):
+        report = self.base / "reports" / "validation.json"
+        report.parent.mkdir()
+        before = sorted(p.relative_to(self.export).as_posix() for p in self.export.rglob("*"))
+        completed = self.run_cli("--report", report)
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        stdout_result = json.loads(completed.stdout)
+        report_result = json.loads(report.read_text(encoding="utf-8"))
+        self.assertTrue(stdout_result["ok"])
+        self.assertEqual(stdout_result, report_result)
+        after = sorted(p.relative_to(self.export).as_posix() for p in self.export.rglob("*"))
+        self.assertEqual(before, after)
+
+    def test_cli_refuses_report_inside_export_without_creating_it(self):
+        report = self.export / "validation.json"
+        completed = self.run_cli("--report", report)
+        self.assertEqual(completed.returncode, 1)
+        result = json.loads(completed.stdout)
+        self.assertTrue(any(x.startswith("REPORT_WRITE_ERROR:") and "outside the export" in x for x in result["findings"]))
+        self.assertFalse(report.exists())
+
+    def test_cli_refuses_to_overwrite_existing_report(self):
+        report = self.base / "existing-report.json"
+        report.write_text("keep-me", encoding="utf-8")
+        completed = self.run_cli("--report", report)
+        self.assertEqual(completed.returncode, 1)
+        self.assertEqual(report.read_text(encoding="utf-8"), "keep-me")
+        result = json.loads(completed.stdout)
+        self.assertTrue(any(x.startswith("REPORT_WRITE_ERROR:") and "refusing to overwrite" in x for x in result["findings"]))
+
+    def test_cli_refuses_report_path_that_is_the_manifest(self):
+        original = self.manifest_path.read_bytes()
+        completed = self.run_cli("--report", self.manifest_path)
+        self.assertEqual(completed.returncode, 1)
+        self.assertEqual(self.manifest_path.read_bytes(), original)
+        result = json.loads(completed.stdout)
+        self.assertTrue(any(x.startswith("REPORT_WRITE_ERROR:") and "must not overwrite the manifest" in x for x in result["findings"]))
 
     def test_accepts_exact_allowlisted_file_with_matching_sha256(self):
         result = self.result()
