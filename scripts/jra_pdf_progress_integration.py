@@ -90,20 +90,21 @@ def build_integrated_progress_report(payload: Any) -> dict[str, object]:
     except ProgressError as exc:
         raise IntegrationError(str(exc)) from exc
     race_report = progress_summary_to_dict(race_summary)
+    retry_race_ids = sorted(
+        race_id for race_id, batch in pdf_by_race.items()
+        if batch.status in {"pending", "failed"}
+    )
     pdf_report = {
         "expected_race_count": pdf_summary.expected_race_count,
         "pdf_count": pdf_summary.pdf_count,
         "covered_race_count": pdf_summary.covered_race_count,
         "counts_by_status": dict(pdf_summary.counts_by_status),
         "retry_pdf_keys": list(pdf_summary.retry_pdf_keys),
-        "retry_race_ids": sorted(
-            race_id for race_id, batch in pdf_by_race.items()
-            if batch.status in {"pending", "failed"}
-        ),
+        "retry_race_ids": retry_race_ids,
     }
     return {
         "pdf_batch_report": pdf_report,
-        "race_ids_requiring_source_pdf": pdf_report["retry_race_ids"],
+        "race_ids_requiring_source_pdf": retry_race_ids,
         "race_progress_report": race_report,
         "overall": {
             "expected_races": len(expected),
@@ -112,7 +113,8 @@ def build_integrated_progress_report(payload: Any) -> dict[str, object]:
             "races_pending": race_report["counts_by_status"]["pending"],
             "races_ready_for_segmentation": race_report["counts_by_status"]["pdf_acquired"],
             "races_reconciled": race_report["counts_by_status"]["reconciled"],
-            "source_pdf_retry_required": len(pdf_report["retry_pdf_keys"]),
+            "pdf_assets_retry_required": len(pdf_summary.retry_pdf_keys),
+            "source_pdf_retry_required": len(retry_race_ids),
         },
         "audit_flags": {
             "mapping_complete_exactly_once": True,
