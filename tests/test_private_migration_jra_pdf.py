@@ -122,14 +122,14 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
     def test_rejects_windows_drive_and_case_colliding_paths(self):
         entry = {
             "path": "C:/outside.py", "source_git_blob_sha1": "b" * 40,
-            "source_bytes": 1, "export": True, "expected_sha256": self.digest,
+            "source_bytes": 1, "status": "ALLOW_CANDIDATE", "export": True, "expected_sha256": self.digest,
         }
         self.write_manifest([entry])
         with self.assertRaisesRegex(ValueError, "unsafe"):
             self.result()
         upper = {
             "path": "Scripts/example.py", "source_git_blob_sha1": "b" * 40,
-            "source_bytes": len(self.body), "export": True, "expected_sha256": self.digest,
+            "source_bytes": len(self.body), "status": "ALLOW_CANDIDATE", "export": True, "expected_sha256": self.digest,
         }
         lower = dict(upper, path="scripts/example.py")
         self.write_manifest([upper, lower])
