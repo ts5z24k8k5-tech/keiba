@@ -180,7 +180,7 @@ def load_prior_download_audit(out_dir: Path) -> dict[str, dict[str, str]]:
     for row in rows:
         url = (row.get("pdf_url") or "").strip()
         digest = (row.get("sha256") or "").strip().lower()
-        if not url or row.get("status") != "downloaded":
+        if not url or row.get("status") not in {"downloaded", "already_verified"}:
             continue
         if url in verified:
             ambiguous.add(url)
@@ -224,7 +224,11 @@ def reuse_verified_pdf(row: dict[str, str], out_dir: Path,
             or len(body) != expected_bytes
             or digest != (previous.get("sha256") or "").lower()):
         return None
-    return Result(url, filename, "already_verified", previous.get("http_status") and int(previous["http_status"]),
+    try:
+        http_status = int(previous.get("http_status") or "0") or None
+    except ValueError:
+        http_status = None
+    return Result(url, filename, "already_verified", http_status,
                   len(body), digest, previous.get("content_type"), None)
 
 
