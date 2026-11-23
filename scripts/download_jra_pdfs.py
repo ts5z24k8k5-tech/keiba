@@ -28,6 +28,17 @@ REQUIRED = {
 ALLOWED_HOSTS = {"www.jra.go.jp", "jra.go.jp"}
 USER_AGENT = "Mozilla/5.0 (compatible; JRAHistoricalPDFResearch/1.0)"
 
+def _is_allowed_jra_url(url: str) -> bool:
+    """Accept only HTTPS URLs to official JRA hosts on the standard port."""
+    try:
+        parsed = urlparse(url)
+        return (parsed.scheme == "https" and parsed.hostname in ALLOWED_HOSTS
+                and parsed.port in (None, 443) and parsed.username is None
+                and parsed.password is None)
+    except ValueError:
+        return False
+
+
 
 class ManifestError(ValueError):
     pass
@@ -64,8 +75,8 @@ def validate_manifest(path: Path, expected_races: int = 149, expected_pdfs: int 
     for i, row in enumerate(rows, 2):
         url = (row.get("pdf_url") or "").strip()
         p = urlparse(url)
-        if p.scheme != "https" or p.hostname not in ALLOWED_HOSTS:
-            raise ManifestError(f"row {i}: URL must be HTTPS on official JRA host")
+        if not _is_allowed_jra_url(url):
+            raise ManifestError(f"row {i}: URL must use HTTPS on an official JRA host and standard port")
         if not p.path.startswith("/datafile/seiseki/report/") or not p.path.lower().endswith(".pdf"):
             raise ManifestError(f"row {i}: URL is not an official result PDF path")
         if url in seen_urls:
@@ -98,16 +109,14 @@ class JRAOnlyRedirectHandler(HTTPRedirectHandler):
     """Reject non-HTTPS or non-JRA redirects before following them."""
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        target = urlparse(newurl)
-        if target.scheme != "https" or target.hostname not in ALLOWED_HOSTS:
-            raise ValueError(f"blocked redirect outside official JRA HTTPS hosts: {newurl}")
+        if not _is_allowed_jra_url(newurl):
+            raise ValueError(f"blocked redirect outside official JRA HTTPS hosts/port: {newurl}")
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 def _fetch(url: str, timeout: int) -> tuple[bytes, int, str, str]:
-    source = urlparse(url)
-    if source.scheme != "https" or source.hostname not in ALLOWED_HOSTS:
-        raise ValueError("source URL must use HTTPS on an official JRA host")
+    if not _is_allowed_jra_url(url):
+        raise ValueError("source URL must use HTTPS on an official JRA host and standard port")
     req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/pdf,*/*;q=0.8"})
     opener = build_opener(JRAOnlyRedirectHandler())
     with opener.open(req, timeout=timeout) as response:
@@ -125,8 +134,8 @@ def download_one(row: dict[str, str], out_dir: Path, timeout: int = 30,
     for attempt in range(retries + 1):
         try:
             body, status, content_type, final_url = fetcher(url, timeout)
-            if urlparse(final_url).hostname not in ALLOWED_HOSTS:
-                raise ValueError("final URL is outside official JRA host")
+            if not _is_allowed_jra_url(final_url):
+                raise ValueError("final URL is outside official JRA HTTPS host/port policy")
             if status != 200:
                 raise ValueError(f"unexpected HTTP status {status}")
             if not body.startswith(b"%PDF-"):
