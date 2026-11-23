@@ -18,7 +18,7 @@ jobs:
         run: |
           visibility="$(gh api "repos/${GITHUB_REPOSITORY}" --jq .visibility)"
           if [ "$visibility" != "private" ]; then
-            echo "::error::Odds snapshots and model-derived market files must not be published from a public repository. Make the repository private first."
+            echo "::error::Odds snapshots and model-derived market files must not be published from a public repository. Use a private standalone repository before running this workflow."
             exit 1
           fi
       - uses: actions/setup-python@v6
