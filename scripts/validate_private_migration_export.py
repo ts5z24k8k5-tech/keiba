@@ -11,7 +11,7 @@ import hashlib
 import json
 import re
 import sys
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
@@ -47,6 +47,7 @@ def validate_manifest(data: object) -> tuple[dict[str, dict], list[str]]:
     allowed: dict[str, dict] = {}
     errors: list[str] = []
     seen: set[str] = set()
+    seen_casefold: set[str] = set()
     for index, item in enumerate(entries):
         if not isinstance(item, dict):
             raise fail(f"entries[{index}] must be an object")
@@ -54,11 +55,12 @@ def validate_manifest(data: object) -> tuple[dict[str, dict], list[str]]:
         if not isinstance(path, str) or not path or "\\" in path:
             raise fail(f"entries[{index}].path is invalid")
         pure = PurePosixPath(path)
-        if pure.is_absolute() or any(part in ("", ".", "..") for part in path.split("/")):
+        if pure.is_absolute() or PureWindowsPath(path).drive or any(part in ("", ".", "..") for part in path.split("/")) or any(ord(ch) < 32 for ch in path):
             raise fail(f"entries[{index}].path is unsafe: {path!r}")
-        if path in seen:
-            raise fail(f"duplicate manifest path: {path}")
+        if path in seen or path.casefold() in seen_casefold:
+            raise fail(f"duplicate or case-colliding manifest path: {path}")
         seen.add(path)
+        seen_casefold.add(path.casefold())
         if not SHA1_RE.fullmatch(str(item.get("source_git_blob_sha1", ""))):
             raise fail(f"invalid source Git blob SHA-1 for {path}")
         if not isinstance(item.get("source_bytes"), int) or item["source_bytes"] < 0:
@@ -146,12 +148,12 @@ def validate_export(root: Path, manifest_path: Path) -> dict:
         actual_size = path.stat().st_size
         if actual_size != item["source_bytes"]:
             findings.append(f"SIZE_MISMATCH: {rel}: expected={item['source_bytes']} actual={actual_size}")
-        expected_digest = item.get("expected_sha256")
-        if expected_digest is None:
-            findings.append(f"SHA256_UNPINNED: {rel}")
-            continue
         actual_digest = sha256_file(path)
         checked += 1
+        expected_digest = item.get("expected_sha256")
+        if expected_digest is None:
+            findings.append(f"SHA256_UNPINNED: {rel}: actual={actual_digest}")
+            continue
         if actual_digest != expected_digest:
             findings.append(f"SHA256_MISMATCH: {rel}: expected={expected_digest} actual={actual_digest}")
     return {
