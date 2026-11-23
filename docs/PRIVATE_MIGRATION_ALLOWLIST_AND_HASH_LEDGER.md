@@ -68,7 +68,7 @@ Status values:
 | `docs/JRA_PDF_PARSER_ACCEPTANCE.md` | `9e6db9c3e6c875ccfcd2af5baf26e197e0a3ae7a` | 23308 | ALLOW_CANDIDATE |  | Synthetic examples and public JRA source reference; re-scan all text before export. |
 | `docs/PRIVATE_MIGRATION_STRATEGY_COMPARISON.md` | `18a8d29dfabb16b349d4c585b762fee8d9dad392` | 10800 | OPTIONAL_INCLUDE |  | Refresh source SHA/PR counts and retain only if a migration decision record is wanted in the operational repo. |
 | `scripts/build_jra_pdf_audit_report.py` | `342ab8bb68028f0c9712c605b88608243cae5a88` | 7816 | ALLOW_CANDIDATE |  | Local-only JSON staging input; private staging JSON/output remain outside Git. |
-| `scripts/build_jra_pdf_batch_report.py` | `6a041aaa5402338176b0c3980b14c5e0774c5eb8` | 3286 | ALLOW_CANDIDATE |  | Local-only private mapping/status JSON; do not include real input files. |
+| `scripts/build_jra_pdf_batch_report.py` | `6a041aaa5402338176b0d3980b14c5e0774c5eb8` | 3286 | ALLOW_CANDIDATE |  | Local-only private mapping/status JSON; do not include real input files. |
 | `scripts/build_jra_pdf_integrated_progress.py` | `673be0ba268d2007b0c367e47610fa42140ffa94` | 1425 | ALLOW_CANDIDATE |  | Local-only private progress JSON; do not include real input files. |
 | `scripts/build_jra_pdf_progress_report.py` | `969023c17624f38920585378ed5d038fc5fb629e` | 3353 | ALLOW_CANDIDATE |  | Local-only private progress JSON; do not include real input files. |
 | `scripts/download_jra_pdfs.py` | `644ecce0b053b9b8bd681c38ea70e5ea3e19035d` | 11932 | ALLOW_CANDIDATE |  | Downloads only from reviewed official JRA PDF URLs; manifest must remain private and outside Git. |
@@ -96,14 +96,14 @@ Status values:
 | `tests/test_jra_pdf_mapping_audit.py` | `53da242c1923e198a51a23b74fffb0acc3b0fd38` | 4655 | ALLOW_CANDIDATE |  | Synthetic race IDs/dates/venue metadata; no private 149-race mapping. |
 | `tests/test_jra_pdf_progress.py` | `f38155db57e350a220566858e4374572b85d8c61` | 2707 | ALLOW_CANDIDATE |  | Synthetic IDs and state codes only. |
 | `tests/test_jra_pdf_progress_integration.py` | `296023ec17bedbb55f5e9a9ca2defc027f76aa9f` | 4863 | ALLOW_CANDIDATE |  | Synthetic mapping/state fixtures only. |
-| `tests/test_jra_pdf_race_audit.py` | `00b6770fb74547961ec8917fad3802a1d8f7689f` | 3879 | ALLOW_CANDIDATE |  | Synthetic runner names/statuses only. |
+| `tests/test_jra_pdf_race_audit.py` | `00b6770fb74547961ec8917fad3802a1d8f7689f` | 3883 | ALLOW_CANDIDATE |  | Synthetic runner names/statuses only. |
 | `tests/test_jra_pdf_race_pipeline.py` | `8bb76d7f5972b8c4d7c48461e0b0855b97daf190` | 3465 | ALLOW_CANDIDATE |  | Synthetic runner rows and coordinates only. |
-| `tests/test_jra_pdf_reconciliation.py` | `00609d07ef36914c89b043d2bdb6d9b799047a7f` | 2445 | ALLOW_CANDIDATE |  | Synthetic field values only. |
+| `tests/test_jra_pdf_reconciliation.py` | `00609d07ef36914c89b043d2bdb6d9b799047a7f` | 2467 | ALLOW_CANDIDATE |  | Synthetic field values only. |
 | `tests/test_jra_pdf_resume.py` | `566d4807ea9429c5e0cdb3eb337f20559ade6f83` | 4050 | ALLOW_CANDIDATE |  | Synthetic download audit/file fixtures; no real PDF. |
-| `tests/test_jra_pdf_runner_fields.py` | `067f9964072b521f9520bfe6fd4e337d319a979f` | 3348 | ALLOW_CANDIDATE |  | Synthetic sample names/odds values only. |
+| `tests/test_jra_pdf_runner_fields.py` | `067f9964072b521f9520bfe6fd4e337d319a979f` | 3468 | ALLOW_CANDIDATE |  | Synthetic sample names/odds values only. |
 | `tests/test_jra_pdf_runner_validation.py` | `cb4a6a145700ec931d9cb8084882fddfaedfd04d` | 3287 | ALLOW_CANDIDATE |  | Synthetic runner rows and SHA-256 placeholder only. |
 | `tests/test_jra_pdf_workflow_security.py` | `ecf621899349190f59b0a1e8ee439d7c4a9f41f5` | 3225 | ALLOW_CANDIDATE |  | Asserts workflow gates and limited permissions; re-run after workflow adaptation. |
-| `tests/test_segment_jra_pdf_text.py` | `7a3c2ed3f60ff789d0ecb76a6db1d06c5890442c` | 3004 | ALLOW_CANDIDATE |  | Synthetic heading/date/venue fixtures only. |
+| `tests/test_segment_jra_pdf_text.py` | `7a3c2ed3f60ff789d0ecb76a6db1d06c5890442c` | 3152 | ALLOW_CANDIDATE |  | Synthetic heading/date/venue fixtures only. |
 
 ## 4. Explicit non-allowlist inventory
 
