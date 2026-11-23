@@ -17,7 +17,8 @@ SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 FORBIDDEN_PARTS = {
     "results", "private_input", "private-input", "output", "outputs",
     "data", "datasets", "snapshots", "models", "logs", "cache", "__pycache__",
-    ".git", ".ssh", ".aws", ".gnupg", "credentials", "secrets",
+    ".git", ".ssh", ".aws", ".gnupg", ".azure", ".gcloud", ".config",
+    "credentials", "secret", "secrets", "token", "tokens", "auth",
 }
 FORBIDDEN_SUFFIXES = (
     ".pdf", ".sqlite", ".sqlite3", ".db", ".parquet", ".pkl", ".pickle",
@@ -26,6 +27,7 @@ FORBIDDEN_SUFFIXES = (
 ALLOWED_SOURCE_SUFFIXES = {".py", ".md", ".yml"}
 FORBIDDEN_NAMES = {
     ".env", ".env.local", ".env.production", "id_rsa", "id_ed25519",
+    ".netrc", ".npmrc", ".pypirc", ".git-credentials", "known_hosts",
     "credentials", "secrets.json",
 }
 
