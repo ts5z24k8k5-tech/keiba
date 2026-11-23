@@ -4,7 +4,7 @@ Date: 2026-11-23
 Decision: **reviewed candidate allowlist; not a migration authorization**  
 Source repository: `ts5z24k8k5-tech/keiba`  
 Source ref: `research/jra-pdf-acquisition-20261123`  
-Pinned source commit for this inventory: `720b96c008ca22db1682927421773808986c9beb`
+Pinned source commit for this inventory: `5d42b26aa46a663a47883afaff72eb5681d2119d`
 
 This document supersedes any assumption that the whole research branch can be exported. Only the paths in the allowlist below are candidates for the first clean-history snapshot. A candidate is not automatically approved for transfer: the destination SHA-256, final content review, and destination-path review must be completed on a trusted local machine immediately before export.
 
@@ -104,7 +104,7 @@ Status values:
 | `tests/test_jra_pdf_runner_fields.py` | `067f9964072b521f9520bfe6fd4e337d319a979f` | 3468 | ALLOW_CANDIDATE |  | Synthetic sample names/odds values only. |
 | `tests/test_jra_pdf_runner_validation.py` | `314ce9f2a29ca1b9f91252c78e8ab914df663fd8` | 3287 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel race IDs, runner rows, and SHA-256 placeholders. |
 | `tests/test_jra_pdf_workflow_security.py` | `ecf621899349190f59b0a1e8ee439d7c4a9f41f5` | 3225 | REWRITE_REQUIRED |  | Depends on workflow and .gitignore files intentionally excluded from operational allowlist; rewrite as a self-contained test or omit. |
-| `tests/test_segment_jra_pdf_text.py` | `d80ef31e449859e821840b77ed1ccee4c56a7886` | 3152 | ALLOW_CANDIDATE |  | Uses 2099 sentinel date/race identity fixtures only. |
+| `tests/test_segment_jra_pdf_text.py` | `40a819b4836b89b901449c1b6863fe1195dffbca` | 3152 | ALLOW_CANDIDATE |  | Uses 2099 sentinel date/race identity fixtures only, including full-width year digits. |
 
 ## 4. Explicit non-allowlist inventory
 
