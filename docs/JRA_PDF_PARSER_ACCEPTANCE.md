@@ -98,3 +98,11 @@ Keep, at minimum:
 - This is intentionally operator-configured rather than an automatic horse-row detector. It prevents headers/footers from being silently accepted or discarded, but depends on accurate per-page measurements from original PDFs.
 - Added 5 synthetic tests for successful selection and the main failure modes.
 - No GitHub Actions run is currently reported for the latest commits, so these tests remain unverified by CI. No real PDF layout has been measured and no real race has been extracted.
+
+
+## Field-by-field reconciliation (reference-driven)
+- Added `scripts/jra_pdf_reconciliation.py` to compare explicitly selected extracted fields against an independently supplied reference mapping.
+- Default comparison is exact after Unicode NFKC and whitespace normalization. Numeric tolerance is never implicit; the caller must explicitly configure a decimal tolerance per requested field.
+- Differences are classified as `mismatch`, `missing_extracted`, or `missing_reference`. Null on both sides is treated as no difference; this does not prove the field was independently verified.
+- Missing keys, duplicate/empty field lists, unrequested tolerances, invalid numeric values, and negative tolerances fail closed.
+- Added 9 synthetic tests. No actual official reference dataset has been loaded, and no 149-race reconciliation has been run. The comparator does not promote data or write to SQLite.
