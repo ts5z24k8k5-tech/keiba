@@ -205,3 +205,13 @@ A race absent from `races` is reported as missing. A supplied race can be struct
 - The local batch report emits these integrity fields alongside the race-ID mapping and retry list. Only pending/failed batches are retry candidates; successful batches are not selected for retry.
 - The ledger validates metadata consistency but does not itself hash local files or trigger network retries. The downloader's resume path independently recomputes file size and SHA-256 before reusing a prior PDF.
 - Synthetic tests cover invalid hashes/sizes and report serialization. No real PDF has been downloaded in this workflow, so no real-file digest has yet been recorded here.
+
+## Integrated PDF-to-race progress (synthetic only)
+- Added `scripts/jra_pdf_progress_integration.py` to derive per-race work state from the private PDF-to-race mapping and PDF acquisition ledger.
+- The integration requires every expected race to map to exactly one PDF. Missing, duplicated, or unexpected mappings fail closed.
+- A pending PDF marks only its mapped races as `pending`; a failed PDF marks only its mapped races as `blocked`. Acquired/validated PDFs allow their mapped races to enter `pdf_acquired`, while later race-stage progress is preserved.
+- If a race is already beyond the PDF stage but its source PDF is pending/failed, the integration rejects the inconsistent ledger rather than silently resetting progress. A race blocked specifically by PDF acquisition can return to `pdf_acquired` after the PDF is validated.
+- Added `scripts/build_jra_pdf_integrated_progress.py` for local private JSON input/output. It performs no download, network retry, SQLite write, or model promotion.
+- Added 7 synthetic tests covering failed/pending PDF scope, recovery, incomplete mapping, conflicting stage state, unexpected race IDs, and CLI output.
+- No real mapping/status ledger has been run through this integration; no official PDF has been downloaded or parsed. Promotion remains disabled.
+- Example: `python -m scripts.build_jra_pdf_integrated_progress --input private_input/jra_pdf_integrated_progress.json --output output/jra_pdf_integrated_progress.json`.
