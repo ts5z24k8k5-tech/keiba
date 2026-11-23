@@ -155,7 +155,7 @@ class PrivateMigrationExportValidationTests(unittest.TestCase):
         self.write_export("docs/extra.json", body)
         entries = [{
             "path": "scripts/example.py", "source_git_blob_sha1": "b" * 40,
-            "source_bytes": len(self.body), "export": True, "expected_sha256": self.digest,
+            "source_bytes": len(self.body), "status": "ALLOW_CANDIDATE", "export": True, "expected_sha256": self.digest,
         }, {
             "path": "docs/extra.json", "source_git_blob_sha1": "c" * 40,
             "source_bytes": len(body), "status": "ALLOW_CANDIDATE", "export": True,
