@@ -80,3 +80,13 @@ Keep, at minimum:
 - No runner-row parser has been accepted. The new runner-candidate validator checks staged records after extraction; it does not yet extract any fields from a PDF.
 - No official PDF has been downloaded or parsed by this workflow.
 - No database has been modified.
+
+
+## Composed race candidate pipeline
+- Added `scripts/jra_pdf_race_pipeline.py` to compose explicit column splitting, strict cell normalization, and runner candidate validation for one race.
+- The caller supplies already-selected runner rows, measured x-coordinate bands, target race ID, declared field size, PDF SHA-256, and zero-based page index. Every supplied row must parse; unassigned words and count/identity errors fail the race. Results are sorted by horse number.
+- The output retains parsed field values and the validation candidate, with horse IDs unresolved. It does not read PDF files, identify runner rows automatically, infer layout, or write to SQLite.
+- Added 6 synthetic tests for sorting, non-finisher status, row-count mismatch, unassigned words, provenance, and required fields.
+- The first implementation's race-ID regex was corrected during review; column bands are now materialized once so an iterator can safely be reused across rows.
+- GitHub Actions has not reported a run for these latest commits. The 6 new tests and previous 8 field tests are therefore not claimed as CI-verified.
+- This pipeline is a composition of synthetic-tested primitives, not proof of extraction accuracy. The next gate is to acquire an original JRA PDF, inspect actual row/column geometry, define reviewed row-selection and column-band rules, and compare extracted counts and values against the official result.
