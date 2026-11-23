@@ -170,3 +170,13 @@ The following is a schema example, not JRA data. Store the real file under the i
 ```
 
 A race absent from `races` is reported as missing. A supplied race can be structurally complete while not fully reconciled; every expected horse number needs a reconciliation report with no differences before `fully_reconciled` becomes true. The report is an audit artifact, not an approval to promote rows into the production database.
+
+
+## Per-race processing progress ledger (synthetic only)
+- Added `scripts/jra_pdf_progress.py` with explicit stages: `pending`, `pdf_acquired`, `segmented`, `extracted`, and `reconciled`; exception states are `manual_review` and `blocked`.
+- The transition validator rejects skipped stages and prevents a manual-review/blocked race from advancing without explicit resolution. The ledger does not itself mutate state or source files.
+- Added `scripts/build_jra_pdf_progress_report.py` to summarize a private progress JSON into counts, missing/unexpected race IDs, and the next action by state. It does not include horse names or extracted race content.
+- The report always emits `promotion_authorized: false`; reconciliation is not production approval. DB promotion remains a separate, explicitly approved operation outside this workflow.
+- Example input fields: `expected_race_ids` plus `races: [{race_id, status, note_code?}]`. Keep real progress JSON under ignored local paths, never in the public repository.
+- Added 14 synthetic tests across the state machine and CLI. CI result pending for the latest commit; no actual race has advanced through this ledger.
+- Example: `python -m scripts.build_jra_pdf_progress_report --input private_input/jra_pdf_progress.json --output output/jra_pdf_progress_report.json`.
