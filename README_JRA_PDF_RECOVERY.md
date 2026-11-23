@@ -30,6 +30,16 @@ the official JRA result-PDF path, checks the PDF signature and minimum size,
 and records byte counts and SHA-256 hashes. The output is published as a
 7-day Actions artifact.
 
+## Public-repository stop condition
+
+The repository must be **private** before this workflow is run. GitHub Actions
+artifacts can be downloaded by people who have read access to the repository;
+for a public repository, that means the PDF artifact must be treated as public.
+The workflow now checks repository visibility before restoring the secret or
+downloading anything, and stops unless visibility is `private`. It also uploads
+an artifact only after the full acquisition and layout-audit steps succeed.
+Do not remove this guard to work around the current public-repository setting.
+
 ## Safety boundaries
 
 - `permissions: contents: read`; no repository write permission.
