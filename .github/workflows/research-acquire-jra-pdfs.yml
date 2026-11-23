@@ -26,14 +26,19 @@ jobs:
           printf '%s' "$MANIFEST_B64" | base64 --decode > private_input/jra_official_pdf_manifest_23.csv
       - name: Run downloader unit tests
         run: python -m unittest discover -s tests -p 'test_download_jra_pdfs.py' -v
-      - name: Install local PDF inspection dependency\n        run: python -m pip install --disable-pip-version-check pymupdf\n      - name: Validate and download official PDFs
+      - name: Install local PDF inspection dependency
+        run: python -m pip install --disable-pip-version-check pymupdf
+      - name: Validate and download official PDFs
         run: |
           python scripts/download_jra_pdfs.py \
             --manifest private_input/jra_official_pdf_manifest_23.csv \
             --out output/jra_pdfs \
             --expected-races 149 --expected-pdfs 23 \
             --timeout 30 --retries 3 --delay 1.5
-      - name: Inspect acquired PDF layout (aggregate metrics only)\n        if: success()\n        run: python scripts/inspect_jra_pdf_layout.py --pdf-dir output/jra_pdfs --out output/jra_pdfs/layout_audit.json\n      - name: Publish acquisition artifact only
+      - name: Inspect acquired PDF layout (aggregate metrics only)
+        if: success()
+        run: python scripts/inspect_jra_pdf_layout.py --pdf-dir output/jra_pdfs --out output/jra_pdfs/layout_audit.json
+      - name: Publish acquisition artifact only
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -43,4 +48,5 @@ jobs:
           path: |
             output/jra_pdfs/*.pdf
             output/jra_pdfs/download_audit.csv
-            output/jra_pdfs/download_summary.json\n            output/jra_pdfs/layout_audit.json
+            output/jra_pdfs/download_summary.json
+            output/jra_pdfs/layout_audit.json
