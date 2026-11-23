@@ -39,7 +39,7 @@ the export directory remains read-only.
 - Symlinks and non-regular files are rejected.
 - Manifest duplicates, absolute paths, backslashes, and traversal components are rejected.
 - Source byte count and exported SHA-256 are checked independently.
-- An unset SHA-256 is a hard failure, never a warning-only pass.
+- An unset SHA-256 is a hard failure, never a warning-only pass; the computed digest is printed so a human reviewer can populate the manifest after inspecting the export.
 
 ## Limitations
 
