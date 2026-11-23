@@ -18,7 +18,7 @@ SHA1_RE = re.compile(r"^[0-9a-f]{40}$")
 FORBIDDEN_PARTS = {
     "results", "private_input", "private-input", "output", "outputs",
     "data", "datasets", "snapshots", "models", "logs", "cache", "__pycache__",
-    ".git",
+    ".git", ".ssh", ".aws", ".gnupg", "credentials", "secrets",
 }
 FORBIDDEN_SUFFIXES = (
     ".pdf", ".sqlite", ".sqlite3", ".db", ".parquet", ".pkl", ".pickle",
@@ -65,9 +65,15 @@ def validate_manifest(data: object) -> tuple[dict[str, dict], list[str]]:
             raise fail(f"invalid source Git blob SHA-1 for {path}")
         if not isinstance(item.get("source_bytes"), int) or item["source_bytes"] < 0:
             raise fail(f"invalid source byte count for {path}")
+        status = item.get("status")
+        valid_statuses = {"ALLOW_CANDIDATE", "OPTIONAL_INCLUDE", "REWRITE_REQUIRED", "ALLOW_AFTER_ADAPTATION"}
+        if status not in valid_statuses:
+            raise fail(f"invalid or missing status for {path}")
         export = item.get("export")
         if not isinstance(export, bool):
             raise fail(f"export must be boolean for {path}")
+        if export and status not in {"ALLOW_CANDIDATE", "OPTIONAL_INCLUDE"}:
+            raise fail(f"status {status} cannot be exported without a reviewed manifest update: {path}")
         digest = item.get("expected_sha256")
         if digest is not None and not SHA256_RE.fullmatch(str(digest)):
             raise fail(f"invalid expected_sha256 for {path}")
