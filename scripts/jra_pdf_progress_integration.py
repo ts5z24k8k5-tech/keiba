@@ -102,7 +102,8 @@ def build_integrated_progress_report(payload: Any) -> dict[str, object]:
         ),
     }
     return {
-        "pdf_batch_report": pdf_report,\n        "race_ids_requiring_source_pdf": pdf_report["retry_race_ids"],
+        "pdf_batch_report": pdf_report,
+        "race_ids_requiring_source_pdf": pdf_report["retry_race_ids"],
         "race_progress_report": race_report,
         "overall": {
             "expected_races": len(expected),
