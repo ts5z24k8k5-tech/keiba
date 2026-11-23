@@ -58,6 +58,8 @@ def audit_race(item: RaceAuditInput) -> RaceAuditResult:
     if not item.race_id or item.expected_runner_count < 1 or item.expected_runner_count > 18:
         raise RaceAuditError("race_id and expected runner count 1..18 are required")
     horse_nos = item.extracted_horse_nos
+    if any(not isinstance(no, int) or isinstance(no, bool) for no in horse_nos):
+        raise RaceAuditError("extracted horse numbers must be integers")
     counts = Counter(horse_nos)
     duplicates = tuple(sorted(no for no, count in counts.items() if count > 1))
     missing = tuple(no for no in range(1, item.expected_runner_count + 1) if no not in counts)
@@ -71,6 +73,8 @@ def audit_race(item: RaceAuditInput) -> RaceAuditResult:
     for report in item.reconciliations:
         if report.race_id != item.race_id:
             raise RaceAuditError("reconciliation report belongs to another race")
+        if not isinstance(report.horse_no, int) or isinstance(report.horse_no, bool) or not 1 <= report.horse_no <= item.expected_runner_count:
+            raise RaceAuditError("reconciliation horse_no is outside expected field")
         pair = (report.race_id, report.horse_no)
         if pair in seen_pairs:
             raise RaceAuditError(f"duplicate reconciliation report for horse_no {report.horse_no}")
