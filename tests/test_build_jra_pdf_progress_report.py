@@ -20,7 +20,7 @@ class ProgressReportCliTests(unittest.TestCase):
     def test_builds_counts_and_next_actions(self):
         report = build_report(payload())
         self.assertEqual(report["counts_by_status"]["pdf_acquired"], 1)
-        self.assertEqual(report["next_actions_by_status"]["segment_race_block"], "segment_race_block")
+        self.assertEqual(report["next_actions_by_status"]["pdf_acquired"], "segment_race_block")
         self.assertEqual(report["races"][1]["next_action"], "resolve_manual_review")
 
     def test_rejects_unknown_root_key(self):
