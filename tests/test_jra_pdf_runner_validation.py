@@ -3,7 +3,7 @@ from scripts.jra_pdf_runner_validation import RunnerCandidate, RunnerValidationE
 
 class RunnerCandidateValidationTests(unittest.TestCase):
     def setUp(self):
-        self.race_id = "202410010101"
+        self.race_id = "209901010101"
         self.digest = "a" * 64
 
     def row(self, horse_no, **overrides):
@@ -29,7 +29,7 @@ class RunnerCandidateValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(RunnerValidationError, "outside"): self.validate([self.row(1), self.row(3)])
 
     def test_rejects_wrong_race_id(self):
-        with self.assertRaisesRegex(RunnerValidationError, "does not match"): self.validate([self.row(1, race_id="202410010102")])
+        with self.assertRaisesRegex(RunnerValidationError, "does not match"): self.validate([self.row(1, race_id="209901010102")])
 
     def test_rejects_empty_name_and_raw_row(self):
         for changes in ({"horse_name": " "}, {"raw_row_text": ""}):

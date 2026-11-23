@@ -3,7 +3,7 @@ import unittest
 from scripts.segment_jra_pdf_text import SegmentationError, segment_expected_races
 
 
-def header(date="11月30日", year="2024", meeting="7", venue="京都",
+def header(date="11月30日", year="2099", meeting="7", venue="京都",
            meeting_day="1", race_no="1"):
     return (
         f"{date} 晴 稍重 （{year}年{meeting}{venue}） "
@@ -12,7 +12,7 @@ def header(date="11月30日", year="2024", meeting="7", venue="京都",
 
 
 class StrictRaceSegmentationTests(unittest.TestCase):
-    def expected(self, race_id="202408070101", date="2024-11-30",
+    def expected(self, race_id="209908070101", date="2099-11-30",
                  venue="kyoto", race_no=1):
         return {"race_id": race_id, "date": date,
                 "venue": venue, "race_no": race_no}
@@ -23,7 +23,7 @@ class StrictRaceSegmentationTests(unittest.TestCase):
             [self.expected()],
         )
         self.assertEqual(len(blocks), 1)
-        self.assertEqual(blocks[0].race_id, "202408070101")
+        self.assertEqual(blocks[0].race_id, "209908070101")
         self.assertEqual(blocks[0].venue, "kyoto")
         self.assertEqual(blocks[0].meeting_no, 7)
         self.assertIn("第1競走", blocks[0].page_text)
@@ -32,7 +32,7 @@ class StrictRaceSegmentationTests(unittest.TestCase):
     def test_accepts_full_width_digits(self):
         text = "１１月３０日 晴 （２０２４年７京都） 第１日 第１競走\n本文"
         blocks = segment_expected_races([text], [self.expected()])
-        self.assertEqual(blocks[0].race_date, "2024-11-30")
+        self.assertEqual(blocks[0].race_date, "2099-11-30")
 
     def test_rejects_wrong_date_even_if_race_number_matches(self):
         with self.assertRaisesRegex(SegmentationError, "identity mismatch"):

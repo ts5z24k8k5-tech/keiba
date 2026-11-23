@@ -13,21 +13,21 @@ from scripts.build_jra_pdf_audit_report import (
 
 def valid_payload():
     return {
-        "expected_race_ids": ["202410010101", "202410010102"],
+        "expected_race_ids": ["209901010101", "209901010102"],
         "races": [
             {
-                "race_id": "202410010101",
+                "race_id": "209901010101",
                 "expected_runner_count": 2,
                 "extracted_horse_nos": [1, 2],
                 "reconciliations": [
                     {
-                        "race_id": "202410010101",
+                        "race_id": "209901010101",
                         "horse_no": 1,
                         "compared_fields": ["finish_rank"],
                         "differences": [],
                     },
                     {
-                        "race_id": "202410010101",
+                        "race_id": "209901010101",
                         "horse_no": 2,
                         "compared_fields": ["finish_rank"],
                         "differences": [
@@ -50,13 +50,13 @@ class BuildAuditReportTests(unittest.TestCase):
         report = build_report_from_payload(valid_payload())
         self.assertEqual(report["expected_race_count"], 2)
         self.assertEqual(report["supplied_race_count"], 1)
-        self.assertEqual(report["missing_race_ids"], ["202410010102"])
+        self.assertEqual(report["missing_race_ids"], ["209901010102"])
         self.assertEqual(report["fully_reconciled_race_count"], 0)
         self.assertEqual(report["races"][0]["mismatch_count_by_field"], {"finish_rank": 1})
 
     def test_complete_race_is_marked_fully_reconciled(self):
         payload = valid_payload()
-        payload["expected_race_ids"] = ["202410010101"]
+        payload["expected_race_ids"] = ["209901010101"]
         payload["races"][0]["reconciliations"][1]["differences"] = []
         report = build_report_from_payload(payload)
         self.assertEqual(report["fully_reconciled_race_count"], 1)
@@ -95,7 +95,7 @@ class BuildAuditReportTests(unittest.TestCase):
             self.assertEqual(result, 0)
             self.assertEqual(source.read_text(encoding="utf-8"), original)
             output = json.loads(target.read_text(encoding="utf-8"))
-            self.assertEqual(output["missing_race_ids"], ["202410010102"])
+            self.assertEqual(output["missing_race_ids"], ["209901010102"])
 
     def test_cli_rejects_same_input_and_output(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -9,28 +9,28 @@ from scripts.jra_pdf_progress import (
 class RaceProgressTests(unittest.TestCase):
     def test_summary_counts_states_and_missing_ids(self):
         summary = build_progress_summary(
-            ["202410010101", "202410010102", "202410010103"],
+            ["209901010101", "209901010102", "209901010103"],
             [
-                RaceProgress("202410010101", "segmented"),
-                RaceProgress("202410010102", "manual_review", "row_count_mismatch"),
+                RaceProgress("209901010101", "segmented"),
+                RaceProgress("209901010102", "manual_review", "row_count_mismatch"),
             ],
         )
         payload = progress_summary_to_dict(summary)
         self.assertEqual(payload["counts_by_status"]["segmented"], 1)
         self.assertEqual(payload["counts_by_status"]["manual_review"], 1)
-        self.assertEqual(payload["missing_race_ids"], ["202410010103"])
+        self.assertEqual(payload["missing_race_ids"], ["209901010103"])
         self.assertFalse(payload["promotion_authorized"])
 
     def test_unexpected_race_is_reported_not_silently_dropped(self):
         summary = build_progress_summary(
-            ["202410010101"], [RaceProgress("202410010999", "pending")]
+            ["209901010101"], [RaceProgress("209901010999", "pending")]
         )
-        self.assertEqual(summary.unexpected_race_ids, ("202410010999",))
+        self.assertEqual(summary.unexpected_race_ids, ("209901010999",))
 
     def test_duplicate_progress_row_fails(self):
-        row = RaceProgress("202410010101")
+        row = RaceProgress("209901010101")
         with self.assertRaisesRegex(ProgressError, "duplicate progress"):
-            build_progress_summary(["202410010101"], [row, row])
+            build_progress_summary(["209901010101"], [row, row])
 
     def test_invalid_race_id_fails(self):
         with self.assertRaisesRegex(ProgressError, "12-digit"):
@@ -56,7 +56,7 @@ class RaceProgressTests(unittest.TestCase):
 
     def test_progress_has_no_implicit_database_promotion(self):
         summary = build_progress_summary(
-            ["202410010101"], [RaceProgress("202410010101", "reconciled")]
+            ["209901010101"], [RaceProgress("209901010101", "reconciled")]
         )
         self.assertFalse(progress_summary_to_dict(summary)["promotion_authorized"])
 

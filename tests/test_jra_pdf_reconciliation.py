@@ -6,7 +6,7 @@ from scripts.jra_pdf_reconciliation import ReconciliationError, reconcile_runner
 class RunnerReconciliationTests(unittest.TestCase):
     def compare(self, actual, expected, fields, **kwargs):
         return reconcile_runner_fields(
-            actual, expected, race_id="202410010101", horse_no=1,
+            actual, expected, race_id="209901010101", horse_no=1,
             fields=fields, **kwargs
         )
 

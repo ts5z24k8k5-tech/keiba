@@ -26,7 +26,7 @@ class RacePipelineTests(unittest.TestCase):
     def test_builds_validated_candidates_and_sorts_by_horse_number(self):
         rows = [self.row(2, "馬B", "2", 20), self.row(1, "馬A", "1", 10)]
         result = build_race_candidates(
-            rows, self.bands, race_id="202410010101",
+            rows, self.bands, race_id="209901010101",
             declared_field_size=2, source_pdf_sha256=self.digest,
             source_page_index=0,
         )
@@ -37,7 +37,7 @@ class RacePipelineTests(unittest.TestCase):
     def test_preserves_nonfinisher_status_without_rank(self):
         result = build_race_candidates(
             [self.row(1, "馬A", "中")], self.bands,
-            race_id="202410010101", declared_field_size=1,
+            race_id="209901010101", declared_field_size=1,
             source_pdf_sha256=self.digest, source_page_index=0,
         )
         self.assertEqual(result[0].candidate.result_status, "中")
@@ -47,7 +47,7 @@ class RacePipelineTests(unittest.TestCase):
         with self.assertRaisesRegex(RaceExtractionError, "does not match"):
             build_race_candidates(
                 [self.row(1, "馬A", "1")], self.bands,
-                race_id="202410010101", declared_field_size=2,
+                race_id="209901010101", declared_field_size=2,
                 source_pdf_sha256=self.digest, source_page_index=0,
             )
 
@@ -57,7 +57,7 @@ class RacePipelineTests(unittest.TestCase):
         ))
         with self.assertRaisesRegex(RaceExtractionError, "does not map"):
             build_race_candidates(
-                [bad], self.bands, race_id="202410010101",
+                [bad], self.bands, race_id="209901010101",
                 declared_field_size=1, source_pdf_sha256=self.digest,
                 source_page_index=0,
             )
@@ -66,7 +66,7 @@ class RacePipelineTests(unittest.TestCase):
         with self.assertRaisesRegex(RaceExtractionError, "SHA-256"):
             build_race_candidates(
                 [self.row(1, "馬A", "1")], self.bands,
-                race_id="202410010101", declared_field_size=1,
+                race_id="209901010101", declared_field_size=1,
                 source_pdf_sha256="bad", source_page_index=0,
             )
 
@@ -74,7 +74,7 @@ class RacePipelineTests(unittest.TestCase):
         row = TextRow(14, tuple(w for w in self.row(1, "馬A", "1").words if w.x0 != 5))
         with self.assertRaisesRegex(RaceExtractionError, "horse_no is required"):
             build_race_candidates(
-                [row], self.bands, race_id="202410010101",
+                [row], self.bands, race_id="209901010101",
                 declared_field_size=1, source_pdf_sha256=self.digest,
                 source_page_index=0,
             )

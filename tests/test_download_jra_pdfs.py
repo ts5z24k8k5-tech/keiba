@@ -41,9 +41,9 @@ class DownloaderTests(unittest.TestCase):
         with path.open("w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=fields); w.writeheader(); w.writerows(rows)
 
-    def row(self, race_id="202408070901", url="https://www.jra.go.jp/datafile/seiseki/report/2024/2024-7kyoto9.pdf"):
-        return {"pdf_url": url, "year": "2024", "venue": "kyoto",
-                "date_start": "2024-12-28", "date_end": "2024-12-28",
+    def row(self, race_id="209908070901", url="https://www.jra.go.jp/datafile/seiseki/report/2099/2099-7kyoto9.pdf"):
+        return {"pdf_url": url, "year": "2099", "venue": "kyoto",
+                "date_start": "2099-12-28", "date_end": "2099-12-28",
                 "target_race_count": "1", "target_race_ids": race_id,
                 "locator_status": "official_pdf_url_web_open_verified"}
 
@@ -66,7 +66,7 @@ class DownloaderTests(unittest.TestCase):
             p = Path(d)/"m.csv"
             rows = [
                 self.row(),
-                self.row(race_id="202408070902", url="https://www.jra.go.jp/datafile/seiseki/report/2024/other/2024-7kyoto9.pdf"),
+                self.row(race_id="209908070902", url="https://www.jra.go.jp/datafile/seiseki/report/2099/other/2099-7kyoto9.pdf"),
             ]
             self.write_manifest(p, rows)
             with self.assertRaises(ManifestError):
@@ -93,7 +93,7 @@ class DownloaderTests(unittest.TestCase):
 
     def test_rejects_duplicate_race_id(self):
         with tempfile.TemporaryDirectory() as d:
-            p = Path(d)/"m.csv"; self.write_manifest(p, [self.row(), self.row(url="https://www.jra.go.jp/datafile/seiseki/report/2024/another.pdf")])
+            p = Path(d)/"m.csv"; self.write_manifest(p, [self.row(), self.row(url="https://www.jra.go.jp/datafile/seiseki/report/2099/another.pdf")])
             with self.assertRaises(ManifestError): validate_manifest(p, 2)
 
     def test_download_saves_pdf_and_hash(self):

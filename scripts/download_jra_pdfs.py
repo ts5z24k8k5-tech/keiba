@@ -65,7 +65,7 @@ class Result:
     error: str | None = None
 
 
-def validate_manifest(path: Path, expected_races: int = 149, expected_pdfs: int | None = None) -> list[dict[str, str]]:
+def validate_manifest(path: Path, expected_races: int | None = None, expected_pdfs: int | None = None) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
         if not reader.fieldnames or not REQUIRED.issubset(reader.fieldnames):
@@ -109,7 +109,7 @@ def validate_manifest(path: Path, expected_races: int = 149, expected_pdfs: int 
                 raise ManifestError(f"row {i}: duplicate race_id {race_id}")
             seen_ids.add(race_id)
         counted += len(ids)
-    if counted != expected_races:
+    if expected_races is not None and counted != expected_races:
         raise ManifestError(f"expected {expected_races} race IDs, found {counted}")
     return rows
 
@@ -236,8 +236,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--manifest", required=True, type=Path)
     ap.add_argument("--out", required=True, type=Path)
-    ap.add_argument("--expected-races", type=int, default=149)
-    ap.add_argument("--expected-pdfs", type=int, default=23)
+    ap.add_argument("--expected-races", type=int, help="optional expected race count")
+    ap.add_argument("--expected-pdfs", type=int, help="optional expected PDF count")
     ap.add_argument("--timeout", type=int, default=30)
     ap.add_argument("--retries", type=int, default=3)
     ap.add_argument("--delay", type=float, default=1.0, help="seconds between PDFs")

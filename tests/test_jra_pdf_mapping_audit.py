@@ -7,22 +7,22 @@ from scripts.jra_pdf_mapping_audit import MappingAuditError, audit_race_pdf_mapp
 
 
 def fixtures():
-    url_a = "https://www.jra.go.jp/datafile/seiseki/report/2024/2024-7kyoto1.pdf"
-    url_b = "https://www.jra.go.jp/datafile/seiseki/report/2024/2024-7kyoto2.pdf"
+    url_a = "https://www.jra.go.jp/datafile/seiseki/report/2099/2099-7kyoto1.pdf"
+    url_b = "https://www.jra.go.jp/datafile/seiseki/report/2099/2099-7kyoto2.pdf"
     mapping = [
-        {"race_id": "202408070101", "date": "2024-11-30", "venue": "kyoto", "meeting_no": "7",
+        {"race_id": "209908070101", "date": "2099-11-30", "venue": "kyoto", "meeting_no": "7",
          "meeting_day": "1", "race_no": "1", "pdf_url": url_a},
-        {"race_id": "202408070102", "date": "2024-11-30", "venue": "kyoto", "meeting_no": "7",
+        {"race_id": "209908070102", "date": "2099-11-30", "venue": "kyoto", "meeting_no": "7",
          "meeting_day": "1", "race_no": "2", "pdf_url": url_a},
-        {"race_id": "202408070201", "date": "2024-12-01", "venue": "kyoto", "meeting_no": "7",
+        {"race_id": "209908070201", "date": "2099-12-01", "venue": "kyoto", "meeting_no": "7",
          "meeting_day": "2", "race_no": "1", "pdf_url": url_b},
     ]
     manifest = [
-        {"pdf_url": url_a, "year": "2024", "venue": "kyoto", "date_start": "2024-11-30",
-         "date_end": "2024-11-30", "target_race_count": "2",
-         "target_race_ids": "202408070101;202408070102"},
-        {"pdf_url": url_b, "year": "2024", "venue": "kyoto", "date_start": "2024-12-01",
-         "date_end": "2024-12-01", "target_race_count": "1", "target_race_ids": "202408070201"},
+        {"pdf_url": url_a, "year": "2099", "venue": "kyoto", "date_start": "2099-11-30",
+         "date_end": "2099-11-30", "target_race_count": "2",
+         "target_race_ids": "209908070101;209908070102"},
+        {"pdf_url": url_b, "year": "2099", "venue": "kyoto", "date_start": "2099-12-01",
+         "date_end": "2099-12-01", "target_race_count": "1", "target_race_ids": "209908070201"},
     ]
     return mapping, manifest
 
@@ -44,7 +44,7 @@ class MappingAuditTests(unittest.TestCase):
 
     def test_manifest_race_set_mismatch_is_reported(self):
         mapping, manifest = fixtures()
-        manifest[0]["target_race_ids"] = "202408070101;202408070199"
+        manifest[0]["target_race_ids"] = "209908070101;209908070199"
         report = audit_race_pdf_mapping(mapping, manifest, 3, 2)
         self.assertIn("race_id_set_mismatch", {e["code"] for e in report["errors"]})
 
@@ -56,7 +56,7 @@ class MappingAuditTests(unittest.TestCase):
 
     def test_date_outside_pdf_range_is_reported(self):
         mapping, manifest = fixtures()
-        mapping[0]["date"] = "2024-12-02"
+        mapping[0]["date"] = "2099-12-02"
         report = audit_race_pdf_mapping(mapping, manifest, 3, 2)
         self.assertIn("date_outside_pdf_range", {e["code"] for e in report["errors"]})
 

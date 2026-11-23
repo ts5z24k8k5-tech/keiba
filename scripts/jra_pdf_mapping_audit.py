@@ -49,13 +49,14 @@ def _iso_date(value: str, label: str) -> date:
 def audit_race_pdf_mapping(
     mapping_rows: list[dict[str, str]],
     manifest_rows: list[dict[str, str]],
-    expected_races: int = 149,
-    expected_pdfs: int = 23,
+    expected_races: int | None = None,
+    expected_pdfs: int | None = None,
 ) -> dict[str, object]:
     if not isinstance(mapping_rows, list) or not isinstance(manifest_rows, list):
         raise MappingAuditError("mapping_rows and manifest_rows must be lists")
-    if expected_races < 1 or expected_pdfs < 1:
-        raise MappingAuditError("expected counts must be positive")
+    if ((expected_races is not None and expected_races < 1)
+            or (expected_pdfs is not None and expected_pdfs < 1)):
+        raise MappingAuditError("specified expected counts must be positive")
     if not mapping_rows or not manifest_rows:
         raise MappingAuditError("mapping and manifest must both be non-empty")
     if not MAPPING_REQUIRED.issubset(mapping_rows[0]):
@@ -67,9 +68,9 @@ def audit_race_pdf_mapping(
     def issue(code: str, key: str, detail: str) -> None:
         errors.append({"code": code, "key": key, "detail": detail})
 
-    if len(mapping_rows) != expected_races:
+    if expected_races is not None and len(mapping_rows) != expected_races:
         issue("mapping_row_count", "mapping", f"expected {expected_races}, found {len(mapping_rows)}")
-    if len(manifest_rows) != expected_pdfs:
+    if expected_pdfs is not None and len(manifest_rows) != expected_pdfs:
         issue("manifest_row_count", "manifest", f"expected {expected_pdfs}, found {len(manifest_rows)}")
 
     mapping_by_id: dict[str, dict[str, str]] = {}
@@ -181,8 +182,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--mapping", required=True, type=Path)
     parser.add_argument("--manifest", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument("--expected-races", type=int, default=149)
-    parser.add_argument("--expected-pdfs", type=int, default=23)
+    parser.add_argument("--expected-races", type=int, help="optional expected race count")
+    parser.add_argument("--expected-pdfs", type=int, help="optional expected PDF count")
     args = parser.parse_args(argv)
     try:
         report = audit_race_pdf_mapping(

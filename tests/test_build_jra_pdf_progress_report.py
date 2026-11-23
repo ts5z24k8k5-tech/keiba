@@ -8,10 +8,10 @@ from scripts.build_jra_pdf_progress_report import ProgressError, build_report, m
 
 def payload():
     return {
-        "expected_race_ids": ["202410010101", "202410010102"],
+        "expected_race_ids": ["209901010101", "209901010102"],
         "races": [
-            {"race_id": "202410010101", "status": "pdf_acquired"},
-            {"race_id": "202410010102", "status": "manual_review", "note_code": "header_mismatch"},
+            {"race_id": "209901010101", "status": "pdf_acquired"},
+            {"race_id": "209901010102", "status": "manual_review", "note_code": "header_mismatch"},
         ],
     }
 

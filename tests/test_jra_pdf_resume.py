@@ -8,7 +8,7 @@ from scripts.download_jra_pdfs import load_prior_download_audit, reuse_verified_
 
 
 class VerifiedResumeTests(unittest.TestCase):
-    URL = "https://www.jra.go.jp/datafile/seiseki/report/2024/resume-test.pdf"
+    URL = "https://www.jra.go.jp/datafile/seiseki/report/2099/resume-test.pdf"
     ROW = {"pdf_url": URL}
 
     def setup_asset(self, directory, *, status="downloaded", digest=None, byte_count=None, filename="resume-test.pdf"):
