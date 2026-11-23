@@ -7,7 +7,7 @@ Scope: the current `main` tree and its GitHub Actions workflows, inspected from 
 
 The repository is currently **public** and is a **fork**. It contains research outputs and model-derived betting analysis that the owner has described as personal-use work. Treat the current contents, commit history, Actions logs, and any artifacts from this repository as publicly accessible.
 
-A public fork cannot have its visibility changed independently. GitHub documents that public forks remain public even if the upstream repository becomes private. The GitHub repository metadata currently reports this fork at 647 KB with zero child forks; that is within the documented size/no-child-fork conditions for the manual Leave network detachment option. This makes detachment into a standalone repository a plausible route, but it is a permanent network change and must be performed deliberately. A separate new private repository is the alternative. See GitHub's fork and visibility documentation before attempting migration.
+A public fork cannot have its visibility changed independently. GitHub documents that public forks remain public even if the upstream repository becomes private. The GitHub repository metadata currently reports this fork at 647 KB with zero child forks; that is within the documented size/no-child-fork conditions for the manual Leave network detachment option. This makes detachment into a standalone repository a plausible route, but it is a permanent network change and must be performed deliberately. GitHub warns that detachment does not retain pull requests, issues, wikis, comments, stars, watchers, or other metadata. In particular, the current Draft PR #1 would be lost; preserve its patch/branch before detaching. A separate new private repository is the alternative. See GitHub's fork and visibility documentation before attempting migration.
 
 ## Tracked-file inventory on main
 
@@ -72,7 +72,7 @@ This is a finding about the available run history, not proof that no artifact ha
 1. Do not run the historical-data, odds-capture, or PDF-acquisition workflows while this repository is public.
 2. Do not merge this draft PR merely to enable PDF acquisition.
 3. For personal-use data, create a separate private repository and migrate only reviewed source code/configuration, keeping private manifests, datasets, predictions, odds, model binaries, and artifacts out of public Git history.
-4. Because this repository is a public fork, it cannot be toggled to private independently. GitHub metadata currently reports 647 KB and zero child forks, so the manual Leave network option appears to meet its documented size and child-fork eligibility conditions. Detachment is permanent; alternatively create a new private repository and migrate reviewed source code.
+4. Because this repository is a public fork, it cannot be toggled to private independently. GitHub metadata currently reports 647 KB and zero child forks, so the manual Leave network option appears to meet its documented size and child-fork eligibility conditions. Detachment is permanent and loses PR #1 and other repository metadata; preserve the research branch/PR patch first. Alternatively create a new private repository and migrate reviewed source code.
 5. Before migrating or changing visibility, review existing public commits, forks, clones, and any previously published Actions artifacts. A visibility change cannot retract copies already made by others.
 6. Confirm third-party data licensing/terms before retaining or republishing downloaded source data.
 
