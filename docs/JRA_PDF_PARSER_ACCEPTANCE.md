@@ -72,7 +72,9 @@ Keep, at minimum:
 ## Current implementation status
 
 - `scripts/segment_jra_pdf_text.py`: strict date/venue/race-number segmentation only.
+- `scripts/jra_pdf_geometry.py`: converts PyMuPDF word tuples into positioned words and groups them into rows with a bounded vertical spread; it does not infer runner fields or semantic columns.
 - `tests/test_segment_jra_pdf_text.py`: synthetic tests for valid matches, full-width digits, wrong date, wrong venue, missing/duplicate headings, duplicate IDs and race-ID/race-number mismatch.
+- Coordinate grouping has synthetic tests only; no real-JRA-PDF geometry has been validated.
 - No runner-row parser has been accepted.
 - No official PDF has been downloaded or parsed by this workflow.
 - No database has been modified.
