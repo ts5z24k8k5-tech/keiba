@@ -3,9 +3,30 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.download_jra_pdfs import ManifestError, validate_manifest, download_one
+from scripts.download_jra_pdfs import (ManifestError, validate_manifest, download_one, JRAOnlyRedirectHandler)
 
 class DownloaderTests(unittest.TestCase):
+    def test_redirect_handler_blocks_non_jra_and_http_targets(self):
+        handler = JRAOnlyRedirectHandler()
+        request = __import__("urllib.request", fromlist=["Request"]).Request(
+            "https://www.jra.go.jp/datafile/seiseki/report/a.pdf"
+        )
+        for target in ("https://example.com/steal", "http://www.jra.go.jp/redirect.pdf"):
+            with self.subTest(target=target):
+                with self.assertRaises(ValueError):
+                    handler.redirect_request(request, None, 302, "Found", {}, target)
+
+    def test_redirect_handler_allows_official_jra_https_target(self):
+        handler = JRAOnlyRedirectHandler()
+        request = __import__("urllib.request", fromlist=["Request"]).Request(
+            "https://www.jra.go.jp/datafile/seiseki/report/a.pdf"
+        )
+        redirected = handler.redirect_request(
+            request, None, 302, "Found", {},
+            "https://jra.go.jp/datafile/seiseki/report/b.pdf"
+        )
+        self.assertEqual(redirected.full_url, "https://jra.go.jp/datafile/seiseki/report/b.pdf")
+
     def write_manifest(self, path, rows):
         fields = ["pdf_url", "year", "venue", "date_start", "date_end",
                   "target_race_count", "target_race_ids", "locator_status"]
