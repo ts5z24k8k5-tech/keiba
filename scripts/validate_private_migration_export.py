@@ -10,7 +10,6 @@ import argparse
 import hashlib
 import json
 import re
-import sys
 from pathlib import Path, PurePosixPath, PureWindowsPath
 
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -55,7 +54,12 @@ def validate_manifest(data: object) -> tuple[dict[str, dict], list[str]]:
         if not isinstance(path, str) or not path or "\\" in path:
             raise fail(f"entries[{index}].path is invalid")
         pure = PurePosixPath(path)
-        if pure.is_absolute() or PureWindowsPath(path).drive or any(part in ("", ".", "..") for part in path.split("/")) or any(ord(ch) < 32 for ch in path):
+        components = path.split("/")
+        windows_reserved = {"con", "prn", "aux", "nul", *(f"com{i}" for i in range(1, 10)), *(f"lpt{i}" for i in range(1, 10))}
+        if (pure.is_absolute() or PureWindowsPath(path).drive
+                or any(part in ("", ".", "..") for part in components)
+                or any(":" in part or part.endswith((" ", ".")) or part.split(".")[0].lower() in windows_reserved for part in components)
+                or any(ord(ch) < 32 or ord(ch) == 127 for ch in path)):
             raise fail(f"entries[{index}].path is unsafe: {path!r}")
         if path in seen or path.casefold() in seen_casefold:
             raise fail(f"duplicate manifest path or case-colliding path: {path}")
@@ -63,7 +67,7 @@ def validate_manifest(data: object) -> tuple[dict[str, dict], list[str]]:
         seen_casefold.add(path.casefold())
         if not SHA1_RE.fullmatch(str(item.get("source_git_blob_sha1", ""))):
             raise fail(f"invalid source Git blob SHA-1 for {path}")
-        if not isinstance(item.get("source_bytes"), int) or item["source_bytes"] < 0:
+        if isinstance(item.get("source_bytes"), bool) or not isinstance(item.get("source_bytes"), int) or item["source_bytes"] < 0:
             raise fail(f"invalid source byte count for {path}")
         status = item.get("status")
         valid_statuses = {"ALLOW_CANDIDATE", "OPTIONAL_INCLUDE", "REWRITE_REQUIRED", "ALLOW_AFTER_ADAPTATION"}
