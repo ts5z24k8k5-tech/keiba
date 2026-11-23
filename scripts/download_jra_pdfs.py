@@ -45,7 +45,7 @@ class Result:
     error: str | None = None
 
 
-def validate_manifest(path: Path, expected_races: int = 149) -> list[dict[str, str]]:
+def validate_manifest(path: Path, expected_races: int = 149, expected_pdfs: int | None = None) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
         if not reader.fieldnames or not REQUIRED.issubset(reader.fieldnames):
@@ -54,6 +54,8 @@ def validate_manifest(path: Path, expected_races: int = 149) -> list[dict[str, s
         rows = list(reader)
     if not rows:
         raise ManifestError("manifest is empty")
+    if expected_pdfs is not None and len(rows) != expected_pdfs:
+        raise ManifestError(f"expected {expected_pdfs} PDF rows, found {len(rows)}")
 
     seen_urls: set[str] = set()
     seen_ids: set[str] = set()
@@ -145,13 +147,14 @@ def main() -> int:
     ap.add_argument("--manifest", required=True, type=Path)
     ap.add_argument("--out", required=True, type=Path)
     ap.add_argument("--expected-races", type=int, default=149)
+    ap.add_argument("--expected-pdfs", type=int, default=23)
     ap.add_argument("--timeout", type=int, default=30)
     ap.add_argument("--retries", type=int, default=3)
     ap.add_argument("--delay", type=float, default=1.0, help="seconds between PDFs")
     args = ap.parse_args()
 
     try:
-        rows = validate_manifest(args.manifest, args.expected_races)
+        rows = validate_manifest(args.manifest, args.expected_races, args.expected_pdfs)
     except (OSError, ManifestError) as exc:
         print(f"MANIFEST ERROR: {exc}", file=sys.stderr)
         return 2
