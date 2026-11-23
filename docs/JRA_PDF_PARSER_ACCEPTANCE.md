@@ -129,3 +129,44 @@ Keep, at minimum:
 - Added 7 synthetic tests for report contents, complete/incomplete reconciliation, strict schema failures, and input immutability.
 - This is an orchestration/serialization layer only. No private staging data has been supplied to it, no original PDF has been acquired, and no actual JRA race has been audited. New tests are pending CI verification.
 - Example (run locally after preparing the private staging JSON): `python -m scripts.build_jra_pdf_audit_report --input private_input/jra_pdf_staging.json --output output/jra_pdf_audit.json`.
+
+
+### Local audit input shape (synthetic example only)
+
+The following is a schema example, not JRA data. Store the real file under the ignored `private_input/` directory.
+
+```json
+{
+  "expected_race_ids": ["202410010101", "202410010102"],
+  "races": [
+    {
+      "race_id": "202410010101",
+      "expected_runner_count": 2,
+      "extracted_horse_nos": [1, 2],
+      "reconciliations": [
+        {
+          "race_id": "202410010101",
+          "horse_no": 1,
+          "compared_fields": ["finish_rank", "jockey_name"],
+          "differences": []
+        },
+        {
+          "race_id": "202410010101",
+          "horse_no": 2,
+          "compared_fields": ["finish_rank"],
+          "differences": [
+            {
+              "field": "finish_rank",
+              "extracted": 3,
+              "reference": 2,
+              "status": "mismatch"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+A race absent from `races` is reported as missing. A supplied race can be structurally complete while not fully reconciled; every expected horse number needs a reconciliation report with no differences before `fully_reconciled` becomes true. The report is an audit artifact, not an approval to promote rows into the production database.
