@@ -15,8 +15,8 @@ This document supersedes any assumption that the whole research branch can be ex
 - 18 PDF-research Python modules listed in section 3.
 - 18 synthetic/unit-test files listed in section 3.
 - `docs/PRIVATE_MIGRATION_STRATEGY_COMPARISON.md` as an optional governance record; refresh its point-in-time source references before copying.
-- `.gitignore`, **only after rewriting it for the new private repository** as described below.
-- `.github/workflows/research-pdf-tests.yml`, **only after adapting its push-branch filter to the destination branch strategy**. Keep Actions disabled until the private destination and workflow have been checked.
+- The source `.gitignore` and workflow are not copied verbatim. Reviewed destination replacements are listed in section 4; both still require exported SHA-256 and destination review.
+- The replacement workflow targets destination `main`, uses read-only permissions, installs the pinned dependency, and runs synthetic tests only. Keep Actions disabled until the private destination is confirmed and reviewed.
 
 The initial allowlist deliberately excludes the PDF acquisition workflow. It can be considered for a later, separate activation stage after the destination is confirmed Private, the manifest secret is installed by the user, and artifact retention/access are reviewed. Do not include or enable it in the first bootstrap push.
 
@@ -64,8 +64,8 @@ Status values:
 
 | Source path | Source Git blob SHA-1 | Source bytes | Status | Exported SHA-256 (fill on trusted machine) | Destination path / review note |
 |---|---|---:|---|---|---|
-| `.gitignore` | `999fd0e2cc29c17ec1c8747eafa690f06e511865` | 340 | REWRITE_REQUIRED |  | Add destination-specific ignores for private inputs, outputs, datasets, snapshots, models, logs, caches, and local secrets. Ignore rules do not untrack existing files. |
-| `.github/workflows/research-pdf-tests.yml` | `702a4c332731a348afc42ceb67f6e1a9679e23db` | 546 | ALLOW_AFTER_ADAPTATION |  | Retain read-only permissions and no artifact upload; adjust push branch filter; run only after Actions are enabled deliberately. |
+| `.gitignore` | `999fd0e2cc29c17ec1c8747eafa690f06e511865` | 340 | REWRITE_REQUIRED |  | Source bytes excluded; destination replacement is listed in section 4. Ignore rules do not untrack already tracked files. |
+| `.github/workflows/research-pdf-tests.yml` | `702a4c332731a348afc42ceb67f6e1a9679e23db` | 546 | ALLOW_AFTER_ADAPTATION |  | Source bytes excluded; adapted destination workflow is listed in section 4. |
 | `docs/JRA_PDF_PARSER_ACCEPTANCE.md` | `9e6db9c3e6c875ccfcd2af5baf26e197e0a3ae7a` | 23308 | REWRITE_REQUIRED |  | Contains project-specific race/PDF counts and time-bound audit claims; keep out of clean-history operational export until rewritten generically. |
 | `docs/PRIVATE_MIGRATION_STRATEGY_COMPARISON.md` | `18a8d29dfabb16b349d4c585b762fee8d9dad392` | 10800 | OPTIONAL_INCLUDE |  | Refresh source SHA/PR counts and retain only if a migration decision record is wanted in the operational repo. |
 | `scripts/build_jra_pdf_audit_report.py` | `342ab8bb68028f0c9712c605b88608243cae5a88` | 7816 | ALLOW_CANDIDATE |  | Local-only JSON staging input; private staging JSON/output remain outside Git. |
