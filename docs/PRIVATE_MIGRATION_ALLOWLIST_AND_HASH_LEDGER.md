@@ -4,7 +4,7 @@ Date: 2026-11-23
 Decision: **reviewed candidate allowlist; not a migration authorization**  
 Source repository: `ts5z24k8k5-tech/keiba`  
 Source ref: `research/jra-pdf-acquisition-20261123`  
-Pinned source commit for this inventory: `53ea1ba3deeda8eddba79632fa62fd82a7e61cd3`
+Pinned source commit for this inventory: `30a14b2ff982e76d2e1c3b27351fc3780e66ed66`
 
 This document supersedes any assumption that the whole research branch can be exported. Only the paths in the allowlist below are candidates for the first clean-history snapshot. A candidate is not automatically approved for transfer: the destination SHA-256, final content review, and destination-path review must be completed on a trusted local machine immediately before export.
 
@@ -68,16 +68,16 @@ Status values:
 | `.github/workflows/research-pdf-tests.yml` | `702a4c332731a348afc42ceb67f6e1a9679e23db` | 546 | ALLOW_AFTER_ADAPTATION |  | Source bytes excluded; adapted destination workflow is listed in section 4. |
 | `docs/JRA_PDF_PARSER_ACCEPTANCE.md` | `9e6db9c3e6c875ccfcd2af5baf26e197e0a3ae7a` | 23308 | REWRITE_REQUIRED |  | Contains project-specific race/PDF counts and time-bound audit claims; keep out of clean-history operational export until rewritten generically. |
 | `docs/PRIVATE_MIGRATION_STRATEGY_COMPARISON.md` | `18a8d29dfabb16b349d4c585b762fee8d9dad392` | 10800 | OPTIONAL_INCLUDE |  | Refresh source SHA/PR counts and retain only if a migration decision record is wanted in the operational repo. |
-| `scripts/build_jra_pdf_audit_report.py` | `342ab8bb68028f0c9712c605b88608243cae5a88` | 7816 | ALLOW_CANDIDATE |  | Local-only JSON staging input; private staging JSON/output remain outside Git. |
-| `scripts/build_jra_pdf_batch_report.py` | `6a041aaa5402338176b0d3980b14c5e0774c5eb8` | 3286 | ALLOW_CANDIDATE |  | Local-only private mapping/status JSON; do not include real input files. |
-| `scripts/build_jra_pdf_integrated_progress.py` | `673be0ba268d2007b0c367e47610fa42140ffa94` | 1425 | ALLOW_CANDIDATE |  | Local-only private progress JSON; do not include real input files. |
-| `scripts/build_jra_pdf_progress_report.py` | `969023c17624f38920585378ed5d038fc5fb629e` | 3353 | ALLOW_CANDIDATE |  | Local-only private progress JSON; do not include real input files. |
+| `scripts/build_jra_pdf_audit_report.py` | `80bdf4a70af0b21c839afe3626a8774378186b70` | 7904 | ALLOW_CANDIDATE |  | Adds CLI output path/symlink protection; inputs/outputs remain explicit local paths. |
+| `scripts/build_jra_pdf_batch_report.py` | `c2b420a1c1fc6c8f5cdbbd6ad629cbac524e8bf8` | 3374 | ALLOW_CANDIDATE |  | Adds CLI output path/symlink protection; inputs/outputs remain explicit local paths. |
+| `scripts/build_jra_pdf_integrated_progress.py` | `beb14524363935f016df37eaef645392e20365a7` | 1513 | ALLOW_CANDIDATE |  | Adds CLI output path/symlink protection; inputs/outputs remain explicit local paths. |
+| `scripts/build_jra_pdf_progress_report.py` | `c641f29267ee6a684a3cb0b2993970d80458c292` | 3441 | ALLOW_CANDIDATE |  | Adds CLI output path/symlink protection; inputs/outputs remain explicit local paths. |
 | `scripts/download_jra_pdfs.py` | `1283f8077d87a3307a9709ebe0b651165c649ef4` | 13087 | ALLOW_CANDIDATE |  | Removed project-specific count defaults; adds a 50 MiB response cap, symlink-target refusal, and exclusive temporary-file creation. |
-| `scripts/inspect_jra_pdf_layout.py` | `3121a46b4e8445909f6829a1db613240d5c261a5` | 3193 | ALLOW_CANDIDATE |  | Runtime/fixture note refreshed after content review. |
+| `scripts/inspect_jra_pdf_layout.py` | `72d32d17a2e257691fd0b23c156f0aa6a90b3c2b` | 3415 | ALLOW_CANDIDATE |  | Adds CLI output path/symlink protection; inputs/outputs remain explicit local paths. |
 | `scripts/jra_pdf_batch_progress.py` | `22f1e3b9150c6b2ad7509dac5d6b4d4d3bc32683` | 5950 | ALLOW_CANDIDATE |  | Metadata-only batch state; actual mapping remains private. |
 | `scripts/jra_pdf_columns.py` | `88c938d46ac8ff088a45f32c4562dc9f0f622930` | 2892 | ALLOW_CANDIDATE |  | Explicit configured coordinate bands; no real layout values should be embedded. |
 | `scripts/jra_pdf_geometry.py` | `78192659b40d4aed7f1e900009a3b2c3f12104c8` | 3374 | ALLOW_CANDIDATE |  | Generic coordinate primitives. |
-| `scripts/jra_pdf_mapping_audit.py` | `6a43c2727f2d5b0fa7023af0bf45ab95c6f06ace` | 9906 | ALLOW_CANDIDATE |  | Removed project-specific 149/23 defaults; expected counts are optional. Real manifests and mapping CSVs remain excluded. |
+| `scripts/jra_pdf_mapping_audit.py` | `638834bf7243489302a1f251e3708f341c1bb67c` | 10196 | ALLOW_CANDIDATE |  | Adds CLI output path/symlink protection; inputs/outputs remain explicit local paths. |
 | `scripts/jra_pdf_progress.py` | `a706620e5ecb209812fa822bb33a5653a562967e` | 4682 | ALLOW_CANDIDATE |  | Generic state-machine logic; no real progress ledger. |
 | `scripts/jra_pdf_progress_integration.py` | `589e9b0881a1802e8b4022d0922095f3768a590d` | 5765 | ALLOW_CANDIDATE |  | Generic integration logic; no real mapping/status JSON. |
 | `scripts/jra_pdf_race_audit.py` | `b41dbe7ea8073fbc310331a3bc84950bc005a7ab` | 7187 | ALLOW_CANDIDATE |  | Aggregate race-quality logic; no actual race staging records. |
@@ -86,15 +86,15 @@ Status values:
 | `scripts/jra_pdf_runner_fields.py` | `789fc13b05200d52190804cff10a5f9b730235a7` | 6109 | ALLOW_CANDIDATE |  | Normalizes caller-supplied cells; no real extracted rows. |
 | `scripts/jra_pdf_runner_validation.py` | `14a809ee11adaca83dd80bd0844904374c9a8369` | 3809 | ALLOW_CANDIDATE |  | Validates staged candidates; no real candidate records. |
 | `scripts/segment_jra_pdf_text.py` | `98c55f6ed1f768dcc48eaa34bbbbff86adba29a8` | 5058 | ALLOW_CANDIDATE |  | Strict segmentation logic; no extracted race text or real mapping. |
-| `tests/test_build_jra_pdf_audit_report.py` | `aa803cc410685a3391500a27323b0aec471406cc` | 4410 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel race IDs; no private mapping or staging data. |
+| `tests/test_build_jra_pdf_audit_report.py` | `a7f0be1982bc239474dc479845faffe552d4af37` | 5060 | ALLOW_CANDIDATE |  | Adds CLI path-boundary regression coverage; uses synthetic fixtures only. |
 | `tests/test_build_jra_pdf_batch_report.py` | `de81f9db11fafdf942eb914d47b6307672863c61` | 1996 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel race IDs; no private mapping or staging data. |
 | `tests/test_build_jra_pdf_progress_report.py` | `36908c216828e6da63f0ae260ebf9de926db3c30` | 1997 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel race IDs; no private progress ledger. |
 | `tests/test_download_jra_pdfs.py` | `b37e4bb8df01a56841f93d5cf31832629daab07c` | 7150 | ALLOW_CANDIDATE |  | Runtime/fixture note refreshed after content review. |
-| `tests/test_inspect_jra_pdf_layout.py` | `542de6766cb7511cb8278f544e0cc98b1a37dc36` | 1827 | ALLOW_CANDIDATE |  | Deliberately uses fake marker strings such as horse-secret-name to assert redaction. |
+| `tests/test_inspect_jra_pdf_layout.py` | `cb7dcac04271566c09cefb38501f099b5887ccfa` | 2728 | ALLOW_CANDIDATE |  | Adds CLI path-boundary regression coverage; uses synthetic fixtures only. |
 | `tests/test_jra_pdf_batch_progress.py` | `475c797a25c729add711ccca747db385601607e8` | 3903 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel race IDs and digest placeholders. |
 | `tests/test_jra_pdf_columns.py` | `c7f03490a1e258c2c1259ceed98573638fa2e539` | 2959 | ALLOW_CANDIDATE |  | Synthetic horse/jockey labels and test values. |
 | `tests/test_jra_pdf_geometry.py` | `288cb72d8fa7d2cac14b9c1b651b1b7c5be58940` | 2702 | ALLOW_CANDIDATE |  | Synthetic geometry only. |
-| `tests/test_jra_pdf_mapping_audit.py` | `2978e6f9de927d29801ef486e1813966b64253e1` | 4655 | ALLOW_CANDIDATE |  | Uses 2099 sentinel race IDs/dates and non-existing official-URL-shaped fixtures; no real mapping values. |
+| `tests/test_jra_pdf_mapping_audit.py` | `6e54b45142a1d54b621ea1f049a195ea4aa4e868` | 6009 | ALLOW_CANDIDATE |  | Adds CLI path-boundary regression coverage; uses synthetic fixtures only. |
 | `tests/test_jra_pdf_progress.py` | `f3c8f24aa2be388746dc67031a5731ef63c21cf5` | 2707 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel IDs and state codes only. |
 | `tests/test_jra_pdf_progress_integration.py` | `981af98f09a26198c8973251fbf0a3035ffcb21b` | 4863 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel mapping/state fixtures only. |
 | `tests/test_jra_pdf_race_audit.py` | `7a798279f3ad43757739e4bcb1326bce8bd0748b` | 3883 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel race IDs and runner-name placeholders only. |
