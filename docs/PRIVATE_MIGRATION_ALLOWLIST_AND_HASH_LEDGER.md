@@ -154,5 +154,5 @@ These files are clean-history replacement/addition artifacts authored on the res
 | `README.md` | `29a7597b219b46b2237e4f6dcb319de0e38e934f` | 4495 | Replaces legacy project instructions with local-only PDF utility setup; pins direct and transitive runtime dependencies. |
 | `requirements.txt` | `80d0b8f052225328a3a60c567cb153ab63d182df` | 293 | Pins PyMuPDF 2.2 and the transitive dependency versions resolved by CI; verify package/license review. |
 | `.gitignore` | `cfd84e6eefe4f1b5493a37c89b90e15804f00b39` | 568 | Destination-specific private input/output, data, model, credential, and runtime ignores. |
-| `.github/workflows/research-pdf-tests.yml` | `bb8b7911b19fdd79007d9bc28a48882e8ed2ae2c` | 861 | Adapted read-only CI; actions pinned to verified commit SHAs, installs dependency, imports backend, runs synthetic tests; no JRA download or artifact upload. |
+| `.github/workflows/research-pdf-tests.yml` | `6eaa9789085e6e967be08f636c1dd20e9a214c4b` | 861 | Adapted read-only CI; actions pinned to verified commit SHAs, installs dependency, imports backend, runs synthetic tests; no JRA download or artifact upload. |
 
