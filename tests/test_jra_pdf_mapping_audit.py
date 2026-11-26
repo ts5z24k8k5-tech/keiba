@@ -93,6 +93,31 @@ class MappingAuditTests(unittest.TestCase):
                                    "--output", str(out)]), 0)
             self.assertTrue(json.loads(out.read_text(encoding="utf-8"))["audit_passed"])
 
+    def test_cli_refuses_output_that_is_an_input_or_symlink(self):
+        mapping, manifest = fixtures()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            mapping_path, manifest_path = root / "mapping.csv", root / "manifest.csv"
+            for path, rows in ((mapping_path, mapping), (manifest_path, manifest)):
+                with path.open("w", newline="", encoding="utf-8") as handle:
+                    writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+                    writer.writeheader()
+                    writer.writerows(rows)
+            before = mapping_path.read_bytes()
+            with self.assertRaises(SystemExit):
+                main(["--mapping", str(mapping_path), "--manifest", str(manifest_path),
+                      "--output", str(mapping_path)])
+            self.assertEqual(mapping_path.read_bytes(), before)
+
+            protected = root / "protected.json"
+            protected.write_text("keep", encoding="utf-8")
+            link = root / "report.json"
+            link.symlink_to(protected)
+            with self.assertRaises(SystemExit):
+                main(["--mapping", str(mapping_path), "--manifest", str(manifest_path),
+                      "--output", str(link)])
+            self.assertEqual(protected.read_text(encoding="utf-8"), "keep")
+
 
 if __name__ == "__main__":
     unittest.main()

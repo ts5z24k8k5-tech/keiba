@@ -12,6 +12,8 @@ def main(argv=None):
     parser.add_argument("--input", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args(argv)
+    if args.output.is_symlink():
+        parser.error("--output must not be a symlink")
     if args.input.resolve() == args.output.resolve():
         parser.error("--input and --output must be different files")
     try:

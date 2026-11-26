@@ -185,6 +185,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--expected-races", type=int, help="optional expected race count")
     parser.add_argument("--expected-pdfs", type=int, help="optional expected PDF count")
     args = parser.parse_args(argv)
+    if args.output.is_symlink():
+        parser.error("--output must not be a symlink")
+    output_resolved = args.output.resolve()
+    if output_resolved in {args.mapping.resolve(), args.manifest.resolve()}:
+        parser.error("--output must be different from --mapping and --manifest")
     try:
         report = audit_race_pdf_mapping(
             _read_csv(args.mapping), _read_csv(args.manifest),

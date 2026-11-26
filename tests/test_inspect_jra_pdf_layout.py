@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-from scripts.inspect_jra_pdf_layout import inspect_pdf
+from scripts.inspect_jra_pdf_layout import inspect_pdf, main
 
 
 class FakePage:
@@ -48,6 +48,25 @@ class LayoutAuditTests(unittest.TestCase):
             report = inspect_pdf(path, opener=lambda _: FakeDocument())
             self.assertEqual(report["page_count"], 0)
             self.assertEqual(report["total_words"], 0)
+
+    def test_cli_refuses_output_that_overwrites_pdf_or_symlink(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            pdf_dir = root / "pdfs"
+            pdf_dir.mkdir()
+            source_pdf = pdf_dir / "sample.pdf"
+            source_pdf.write_bytes(b"%PDF-synthetic")
+            with self.assertRaises(SystemExit):
+                main(["--pdf-dir", str(pdf_dir), "--out", str(source_pdf)])
+            self.assertEqual(source_pdf.read_bytes(), b"%PDF-synthetic")
+
+            protected = root / "protected.json"
+            protected.write_text("keep", encoding="utf-8")
+            link = root / "report.json"
+            link.symlink_to(protected)
+            with self.assertRaises(SystemExit):
+                main(["--pdf-dir", str(pdf_dir), "--out", str(link)])
+            self.assertEqual(protected.read_text(encoding="utf-8"), "keep")
 
 
 if __name__ == "__main__":

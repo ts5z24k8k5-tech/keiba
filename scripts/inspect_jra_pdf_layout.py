@@ -57,15 +57,19 @@ def inspect_pdf(path: Path, opener: Callable | None = None) -> dict:
     }
 
 
-def main() -> int:
+def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--pdf-dir", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     files = sorted(args.pdf_dir.glob("*.pdf"))
     if not files:
         parser.error(f"no PDF files found in {args.pdf_dir}")
+    if args.out.is_symlink():
+        parser.error("--out must not be a symlink")
+    if args.out.resolve() in {path.resolve() for path in files}:
+        parser.error("--out must not overwrite a source PDF")
 
     reports = []
     failures = []

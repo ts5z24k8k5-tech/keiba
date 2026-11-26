@@ -104,6 +104,19 @@ class BuildAuditReportTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 main(["--input", str(source), "--output", str(source)])
 
+    def test_cli_refuses_symlink_output(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            input_path = root / "input.json"
+            input_path.write_text(json.dumps(valid_payload()), encoding="utf-8")
+            protected = root / "protected.json"
+            protected.write_text("keep", encoding="utf-8")
+            link = root / "report.json"
+            link.symlink_to(protected)
+            with self.assertRaises(SystemExit):
+                main(["--input", str(input_path), "--output", str(link)])
+            self.assertEqual(protected.read_text(encoding="utf-8"), "keep")
+
 
 if __name__ == "__main__":
     unittest.main()
