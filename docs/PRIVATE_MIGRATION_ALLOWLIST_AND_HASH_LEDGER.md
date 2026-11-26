@@ -151,8 +151,8 @@ These files are clean-history replacement/addition artifacts authored on the res
 
 | Path | Current branch blob SHA-1 | Bytes | Purpose / gate |
 |---|---|---:|---|
-| `README.md` | `aa861514ee7bc1240ef2d0e3bc8876f0b5da3393` | 4504 | Replaces legacy project instructions with local-only PDF utility setup and data-handling guidance. |
-| `requirements.txt` | `2d343f43b69b6dbd28bd00bd2d43b657850acf8b` | 13 | Pins PyMuPDF 2.2 for the PDF geometry CLI; verify package/license review. |
+| `README.md` | `29a7597b219b46b2237e4f6dcb319de0e38e934f` | 4495 | Replaces legacy project instructions with local-only PDF utility setup; pins direct and transitive runtime dependencies. |
+| `requirements.txt` | `80d0b8f052225328a3a60c567cb153ab63d182df` | 293 | Pins PyMuPDF 2.2 and the transitive dependency versions resolved by CI; verify package/license review. |
 | `.gitignore` | `cfd84e6eefe4f1b5493a37c89b90e15804f00b39` | 568 | Destination-specific private input/output, data, model, credential, and runtime ignores. |
 | `.github/workflows/research-pdf-tests.yml` | `bb8b7911b19fdd79007d9bc28a48882e8ed2ae2c` | 775 | Adapted read-only CI; installs dependency, imports backend, runs synthetic tests; no JRA download or artifact upload. |
 
