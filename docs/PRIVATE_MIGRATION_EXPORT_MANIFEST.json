@@ -3,7 +3,7 @@
   "source": {
     "repository": "ts5z24k8k5-tech/keiba",
     "ref": "research/jra-pdf-acquisition-20261123",
-    "commit": "5d42b26aa46a663a47883afaff72eb5681d2119d"
+    "commit": "53ea1ba3deeda8eddba79632fa62fd82a7e61cd3"
   },
   "policy": "Exact-path clean-history export; only entries with export=true are permitted. SHA-256 must be populated from trusted exported bytes before validation.",
   "entries": [
@@ -73,16 +73,16 @@
     },
     {
       "path": "scripts/download_jra_pdfs.py",
-      "source_git_blob_sha1": "de842005cf1abb923cf8f1763b4b8f38867c89dc",
-      "source_bytes": 12019,
+      "source_git_blob_sha1": "1283f8077d87a3307a9709ebe0b651165c649ef4",
+      "source_bytes": 13087,
       "status": "ALLOW_CANDIDATE",
       "export": true,
       "expected_sha256": null
     },
     {
       "path": "scripts/inspect_jra_pdf_layout.py",
-      "source_git_blob_sha1": "9242c71eae7eaf8105175b72afab6571bb1bf76a",
-      "source_bytes": 3164,
+      "source_git_blob_sha1": "3121a46b4e8445909f6829a1db613240d5c261a5",
+      "source_bytes": 3193,
       "status": "ALLOW_CANDIDATE",
       "export": true,
       "expected_sha256": null
@@ -209,8 +209,8 @@
     },
     {
       "path": "tests/test_download_jra_pdfs.py",
-      "source_git_blob_sha1": "f55c3aff69f1e14a79ba51d8b5b26934034487c2",
-      "source_bytes": 5785,
+      "source_git_blob_sha1": "b37e4bb8df01a56841f93d5cf31832629daab07c",
+      "source_bytes": 7150,
       "status": "ALLOW_CANDIDATE",
       "export": true,
       "expected_sha256": null

@@ -4,7 +4,7 @@ Date: 2026-11-23
 Decision: **reviewed candidate allowlist; not a migration authorization**  
 Source repository: `ts5z24k8k5-tech/keiba`  
 Source ref: `research/jra-pdf-acquisition-20261123`  
-Pinned source commit for this inventory: `5d42b26aa46a663a47883afaff72eb5681d2119d`
+Pinned source commit for this inventory: `53ea1ba3deeda8eddba79632fa62fd82a7e61cd3`
 
 This document supersedes any assumption that the whole research branch can be exported. Only the paths in the allowlist below are candidates for the first clean-history snapshot. A candidate is not automatically approved for transfer: the destination SHA-256, final content review, and destination-path review must be completed on a trusted local machine immediately before export.
 
@@ -24,7 +24,7 @@ The initial allowlist deliberately excludes the PDF acquisition workflow. It can
 
 | Path | Decision | Reason / required action |
 |---|---|---|
-| `README.md` | Rewrite; do not copy as-is | Contains legacy historical-data collection instructions and claims about model status that may not describe the private working baseline. Create a new README describing only the approved private workflow. |
+| `README.md` | Rewrite; do not copy as-is | Legacy README is replaced by a local-only PDF-tool README drafted on the research branch; verify its exported SHA-256 before transfer. |
 | `README_JRA_PDF_RECOVERY.md` | Rewrite; do not copy as-is | Refers to this repository being a public fork, current source-repo state, old migration steps and the public-fork stop condition. Replace those with destination-specific instructions after migration design is approved. |
 | `.github/workflows/research-acquire-jra-pdfs.yml` | Defer | Handles source PDFs and uploads them as Actions artifacts. Only consider after Private visibility is confirmed, secret and artifact access are reviewed, and the user explicitly authorizes activation. |
 | `docs/PRIVATE_MIGRATION_PREFLIGHT_AUDIT.md` | Do not copy to operational repo | Source-specific, time-bound public exposure audit with historical repo/PR/Actions details. Retain separately as migration evidence. |
@@ -72,8 +72,8 @@ Status values:
 | `scripts/build_jra_pdf_batch_report.py` | `6a041aaa5402338176b0d3980b14c5e0774c5eb8` | 3286 | ALLOW_CANDIDATE |  | Local-only private mapping/status JSON; do not include real input files. |
 | `scripts/build_jra_pdf_integrated_progress.py` | `673be0ba268d2007b0c367e47610fa42140ffa94` | 1425 | ALLOW_CANDIDATE |  | Local-only private progress JSON; do not include real input files. |
 | `scripts/build_jra_pdf_progress_report.py` | `969023c17624f38920585378ed5d038fc5fb629e` | 3353 | ALLOW_CANDIDATE |  | Local-only private progress JSON; do not include real input files. |
-| `scripts/download_jra_pdfs.py` | `de842005cf1abb923cf8f1763b4b8f38867c89dc` | 12019 | ALLOW_CANDIDATE |  | Removed project-specific 149/23 defaults; expected counts are optional explicit CLI inputs. Network access remains restricted to official JRA result-PDF HTTPS URLs. |
-| `scripts/inspect_jra_pdf_layout.py` | `9242c71eae7eaf8105175b72afab6571bb1bf76a` | 3164 | ALLOW_CANDIDATE |  | Aggregate geometry audit; verify it continues to omit raw text and runner names. |
+| `scripts/download_jra_pdfs.py` | `1283f8077d87a3307a9709ebe0b651165c649ef4` | 13087 | ALLOW_CANDIDATE |  | Removed project-specific count defaults; adds a 50 MiB response cap, symlink-target refusal, and exclusive temporary-file creation. |
+| `scripts/inspect_jra_pdf_layout.py` | `3121a46b4e8445909f6829a1db613240d5c261a5` | 3193 | ALLOW_CANDIDATE |  | Runtime/fixture note refreshed after content review. |
 | `scripts/jra_pdf_batch_progress.py` | `22f1e3b9150c6b2ad7509dac5d6b4d4d3bc32683` | 5950 | ALLOW_CANDIDATE |  | Metadata-only batch state; actual mapping remains private. |
 | `scripts/jra_pdf_columns.py` | `88c938d46ac8ff088a45f32c4562dc9f0f622930` | 2892 | ALLOW_CANDIDATE |  | Explicit configured coordinate bands; no real layout values should be embedded. |
 | `scripts/jra_pdf_geometry.py` | `78192659b40d4aed7f1e900009a3b2c3f12104c8` | 3374 | ALLOW_CANDIDATE |  | Generic coordinate primitives. |
@@ -89,7 +89,7 @@ Status values:
 | `tests/test_build_jra_pdf_audit_report.py` | `aa803cc410685a3391500a27323b0aec471406cc` | 4410 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel race IDs; no private mapping or staging data. |
 | `tests/test_build_jra_pdf_batch_report.py` | `de81f9db11fafdf942eb914d47b6307672863c61` | 1996 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel race IDs; no private mapping or staging data. |
 | `tests/test_build_jra_pdf_progress_report.py` | `36908c216828e6da63f0ae260ebf9de926db3c30` | 1997 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel race IDs; no private progress ledger. |
-| `tests/test_download_jra_pdfs.py` | `f55c3aff69f1e14a79ba51d8b5b26934034487c2` | 5785 | ALLOW_CANDIDATE |  | Uses 2099 sentinel IDs/dates and URL-shaped non-existing test fixtures; fetcher is injected and no real download occurs. |
+| `tests/test_download_jra_pdfs.py` | `b37e4bb8df01a56841f93d5cf31832629daab07c` | 7150 | ALLOW_CANDIDATE |  | Runtime/fixture note refreshed after content review. |
 | `tests/test_inspect_jra_pdf_layout.py` | `542de6766cb7511cb8278f544e0cc98b1a37dc36` | 1827 | ALLOW_CANDIDATE |  | Deliberately uses fake marker strings such as horse-secret-name to assert redaction. |
 | `tests/test_jra_pdf_batch_progress.py` | `475c797a25c729add711ccca747db385601607e8` | 3903 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel race IDs and digest placeholders. |
 | `tests/test_jra_pdf_columns.py` | `c7f03490a1e258c2c1259ceed98573638fa2e539` | 2959 | ALLOW_CANDIDATE |  | Synthetic horse/jockey labels and test values. |
@@ -143,3 +143,16 @@ Before any future export, a human operator must verify each item:
 The file list, byte counts, and Git blob SHAs were retrieved from the source branch tree. The listed Python modules and tests were fetched and checked for obvious credential patterns; test fixtures were reviewed for synthetic sample values. Workflow YAML, README files, and key documentation were inspected. This is a source-tree review, not a forensic scan of every historical Git object, all Actions logs/artifacts, or external backups. The SHA-256 values remain blank intentionally because no local export was performed.
 
 This document is a planning and verification artifact only. It does not authorize migration or imply that any private destination exists.
+
+
+## 4. Destination-generated bootstrap files (outside the 36 source candidates)
+
+These files are clean-history replacement/addition artifacts authored on the research branch, not files copied from the pinned source tree. They do not change the 36-file source allowlist. Before any transfer, compute and verify their exported SHA-256 on the trusted export machine and review the destination paths.
+
+| Path | Current branch blob SHA-1 | Bytes | Purpose / gate |
+|---|---|---:|---|
+| `README.md` | `aa861514ee7bc1240ef2d0e3bc8876f0b5da3393` | 4504 | Replaces legacy project instructions with local-only PDF utility setup and data-handling guidance. |
+| `requirements.txt` | `2d343f43b69b6dbd28bd00bd2d43b657850acf8b` | 13 | Pins PyMuPDF 2.2 for the PDF geometry CLI; verify package/license review. |
+| `.gitignore` | `cfd84e6eefe4f1b5493a37c89b90e15804f00b39` | 568 | Destination-specific private input/output, data, model, credential, and runtime ignores. |
+| `.github/workflows/research-pdf-tests.yml` | `bb8b7911b19fdd79007d9bc28a48882e8ed2ae2c` | 775 | Adapted read-only CI; installs dependency, imports backend, runs synthetic tests; no JRA download or artifact upload. |
+
