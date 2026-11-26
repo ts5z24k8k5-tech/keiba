@@ -1,9 +1,9 @@
-name: Research PDF downloader tests
+name: Research PDF utility tests
 
 on:
   push:
     branches:
-      - "research/jra-pdf-acquisition-20261123"
+      - main
   pull_request:
 
 permissions:
@@ -12,13 +12,19 @@ permissions:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - name: Check out pull request
+      - name: Check out repository
         uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.11"
-      - name: Run all JRA PDF research tests
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install pinned runtime dependency
+        run: python -m pip install -r requirements.txt
+      - name: Verify PDF backend
+        run: python -c "import pymupdf; print('PyMuPDF import OK')"
+      - name: Run synthetic unit tests
         run: python -m unittest discover -s tests -p 'test_*jra_pdf*.py' -v

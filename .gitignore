@@ -1,17 +1,21 @@
-# Private source inputs and manifests
+# Private inputs and generated outputs (never commit real race data)
 private_input/
-
-# Local generated research outputs: PDFs, databases, datasets, reports and audit files
+private-input/
+private_output/
+private-output/
 output/
+outputs/
+data/
+datasets/
+snapshots/
+models/
+logs/
+cache/
 
-# Local credentials and key material
-.env
-.env.*
-!.env.example
-*.pem
-*.key
-
-# Local databases and model/data binaries
+# Downloaded source PDFs and extracted artifacts
+*.pdf
+*.pdf.part
+*.csv
 *.sqlite
 *.sqlite3
 *.db
@@ -22,3 +26,24 @@ output/
 *.pt
 *.pth
 *.h5
+
+# Local credentials and key material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+.netrc
+.git-credentials
+
+# Python build/runtime artifacts
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
