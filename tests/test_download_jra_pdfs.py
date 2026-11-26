@@ -2,7 +2,9 @@ import csv
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
+from scripts import download_jra_pdfs as downloader
 from scripts.download_jra_pdfs import (ManifestError, validate_manifest, download_one, JRAOnlyRedirectHandler)
 
 class DownloaderTests(unittest.TestCase):
@@ -112,5 +114,29 @@ class DownloaderTests(unittest.TestCase):
             r = download_one(self.row(), Path(d), retries=0, fetcher=fake, sleep=lambda _: None)
             self.assertEqual(r.status, "failed")
             self.assertIn("PDF signature", r.error)
+
+    def test_rejects_oversized_pdf_before_write(self):
+        body = b"%PDF-1.4" + b"x" * 1500
+        def fake(url, timeout): return body, 200, "application/pdf", url
+        with tempfile.TemporaryDirectory() as d:
+            with patch.object(downloader, "MAX_PDF_BYTES", 1500):
+                result = download_one(self.row(), Path(d), retries=0, fetcher=fake, sleep=lambda _: None)
+            self.assertEqual(result.status, "failed")
+            self.assertIn("exceeds", result.error)
+            self.assertFalse((Path(d) / "2099-7kyoto9.pdf").exists())
+
+    def test_refuses_symlink_output_target(self):
+        body = b"%PDF-1.4" + b"x" * 1500
+        def fake(url, timeout): return body, 200, "application/pdf", url
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            protected = root / "protected.txt"
+            protected.write_text("keep", encoding="utf-8")
+            target = root / "2099-7kyoto9.pdf"
+            target.symlink_to(protected)
+            result = download_one(self.row(), root, retries=0, fetcher=fake, sleep=lambda _: None)
+            self.assertEqual(result.status, "failed")
+            self.assertIn("symlink", result.error)
+            self.assertEqual(protected.read_text(encoding="utf-8"), "keep")
 
 if __name__ == "__main__": unittest.main()

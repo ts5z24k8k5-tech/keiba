@@ -19,9 +19,9 @@ from scripts.jra_pdf_geometry import group_words_into_rows, positioned_words_fro
 def inspect_pdf(path: Path, opener: Callable | None = None) -> dict:
     if opener is None:
         try:
-            import fitz
+            import pymupdf
         except ImportError as exc:
-            raise RuntimeError("PyMuPDF is required: install package 'pymupdf'") from exc
+            raise RuntimeError("PyMuPDF is required: install the pinned dependency from requirements.txt") from exc
         opener = fitz.open
 
     digest = hashlib.sha256(path.read_bytes()).hexdigest()

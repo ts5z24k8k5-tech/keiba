@@ -14,6 +14,7 @@ import os
 import random
 import re
 import sys
+import tempfile
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -27,6 +28,7 @@ REQUIRED = {
     "target_race_count", "target_race_ids", "locator_status",
 }
 ALLOWED_HOSTS = {"www.jra.go.jp", "jra.go.jp"}
+MAX_PDF_BYTES = 50 * 1024 * 1024  # 50 MiB safety ceiling per response
 USER_AGENT = "Mozilla/5.0 (compatible; JRAHistoricalPDFResearch/1.0)"
 
 def _is_allowed_jra_url(url: str) -> bool:
@@ -130,7 +132,12 @@ def _fetch(url: str, timeout: int) -> tuple[bytes, int, str, str]:
     opener = build_opener(JRAOnlyRedirectHandler())
     with opener.open(req, timeout=timeout) as response:
         final_url = response.geturl()
-        body = response.read()
+        declared_length = response.headers.get("Content-Length", "")
+        if declared_length.isdigit() and int(declared_length) > MAX_PDF_BYTES:
+            raise ValueError(f"PDF response exceeds {MAX_PDF_BYTES} byte limit")
+        body = response.read(MAX_PDF_BYTES + 1)
+        if len(body) > MAX_PDF_BYTES:
+            raise ValueError(f"PDF response exceeds {MAX_PDF_BYTES} byte limit")
         return body, int(response.status), response.headers.get("Content-Type", ""), final_url
 
 
@@ -151,11 +158,25 @@ def download_one(row: dict[str, str], out_dir: Path, timeout: int = 30,
                 raise ValueError("response does not begin with PDF signature")
             if len(body) < 1024:
                 raise ValueError(f"PDF payload suspiciously small: {len(body)} bytes")
+            if len(body) > MAX_PDF_BYTES:
+                raise ValueError(f"PDF payload exceeds {MAX_PDF_BYTES} byte limit")
             out_dir.mkdir(parents=True, exist_ok=True)
             target = out_dir / filename
-            tmp = target.with_suffix(target.suffix + ".part")
-            tmp.write_bytes(body)
-            os.replace(tmp, target)
+            if target.is_symlink():
+                raise ValueError("refusing to replace a symlink target")
+            tmp_path = None
+            try:
+                with tempfile.NamedTemporaryFile(
+                    mode="wb", dir=out_dir, prefix=f".{filename}.", suffix=".part",
+                    delete=False,
+                ) as tmp:
+                    tmp_path = Path(tmp.name)
+                    tmp.write(body)
+                os.replace(tmp_path, target)
+                tmp_path = None
+            finally:
+                if tmp_path is not None:
+                    tmp_path.unlink(missing_ok=True)
             return Result(url, filename, "downloaded", status, len(body),
                           hashlib.sha256(body).hexdigest(), content_type)
         except (HTTPError, URLError, TimeoutError, OSError, ValueError) as exc:
