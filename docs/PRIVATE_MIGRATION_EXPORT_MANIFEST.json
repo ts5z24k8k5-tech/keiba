@@ -3,7 +3,7 @@
   "source": {
     "repository": "ts5z24k8k5-tech/keiba",
     "ref": "research/jra-pdf-acquisition-20261123",
-    "commit": "30a14b2ff982e76d2e1c3b27351fc3780e66ed66"
+    "commit": "33ff31300b95f38c3da671f53a26816e8996568c"
   },
   "policy": "Exact-path clean-history export; only entries with export=true are permitted. SHA-256 must be populated from trusted exported bytes before validation.",
   "entries": [
@@ -249,8 +249,8 @@
     },
     {
       "path": "tests/test_jra_pdf_mapping_audit.py",
-      "source_git_blob_sha1": "6e54b45142a1d54b621ea1f049a195ea4aa4e868",
-      "source_bytes": 6009,
+      "source_git_blob_sha1": "96dd5e4dfbf3af272c1a41402c400c389b3af6b1",
+      "source_bytes": 6020,
       "status": "ALLOW_CANDIDATE",
       "export": true,
       "expected_sha256": null

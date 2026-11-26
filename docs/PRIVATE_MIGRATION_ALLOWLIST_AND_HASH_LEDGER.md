@@ -4,7 +4,7 @@ Date: 2026-11-23
 Decision: **reviewed candidate allowlist; not a migration authorization**  
 Source repository: `ts5z24k8k5-tech/keiba`  
 Source ref: `research/jra-pdf-acquisition-20261123`  
-Pinned source commit for this inventory: `30a14b2ff982e76d2e1c3b27351fc3780e66ed66`
+Pinned source commit for this inventory: `33ff31300b95f38c3da671f53a26816e8996568c`
 
 This document supersedes any assumption that the whole research branch can be exported. Only the paths in the allowlist below are candidates for the first clean-history snapshot. A candidate is not automatically approved for transfer: the destination SHA-256, final content review, and destination-path review must be completed on a trusted local machine immediately before export.
 
@@ -94,7 +94,7 @@ Status values:
 | `tests/test_jra_pdf_batch_progress.py` | `475c797a25c729add711ccca747db385601607e8` | 3903 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel race IDs and digest placeholders. |
 | `tests/test_jra_pdf_columns.py` | `c7f03490a1e258c2c1259ceed98573638fa2e539` | 2959 | ALLOW_CANDIDATE |  | Synthetic horse/jockey labels and test values. |
 | `tests/test_jra_pdf_geometry.py` | `288cb72d8fa7d2cac14b9c1b651b1b7c5be58940` | 2702 | ALLOW_CANDIDATE |  | Synthetic geometry only. |
-| `tests/test_jra_pdf_mapping_audit.py` | `6e54b45142a1d54b621ea1f049a195ea4aa4e868` | 6009 | ALLOW_CANDIDATE |  | Adds CLI path-boundary regression coverage; uses synthetic fixtures only. |
+| `tests/test_jra_pdf_mapping_audit.py` | `96dd5e4dfbf3af272c1a41402c400c389b3af6b1` | 6020 | ALLOW_CANDIDATE |  | Adds CLI path-boundary regression coverage; uses synthetic fixtures only. |
 | `tests/test_jra_pdf_progress.py` | `f3c8f24aa2be388746dc67031a5731ef63c21cf5` | 2707 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel IDs and state codes only. |
 | `tests/test_jra_pdf_progress_integration.py` | `981af98f09a26198c8973251fbf0a3035ffcb21b` | 4863 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel mapping/state fixtures only. |
 | `tests/test_jra_pdf_race_audit.py` | `7a798279f3ad43757739e4bcb1326bce8bd0748b` | 3883 | ALLOW_CANDIDATE |  | Uses synthetic 2099 sentinel race IDs and runner-name placeholders only. |
