@@ -64,8 +64,8 @@ Status values:
 
 | Source path | Source Git blob SHA-1 | Source bytes | Status | Exported SHA-256 (fill on trusted machine) | Destination path / review note |
 |---|---|---:|---|---|---|
-| `.gitignore` | `999fd0e2cc29c17ec1c8747eafa690f06e511865` | 340 | REWRITE_REQUIRED |  | Source bytes excluded; destination replacement is listed in section 4. Ignore rules do not untrack already tracked files. |
-| `.github/workflows/research-pdf-tests.yml` | `702a4c332731a348afc42ceb67f6e1a9679e23db` | 546 | ALLOW_AFTER_ADAPTATION |  | Source bytes excluded; adapted destination workflow is listed in section 4. |
+| `.gitignore` | `cfd84e6eefe4f1b5493a37c89b90e15804f00b39` | 568 | REWRITE_REQUIRED |  | Source bytes excluded; destination replacement is listed in section 4. Ignore rules do not untrack already tracked files. |
+| `.github/workflows/research-pdf-tests.yml` | `bb8b7911b19fdd79007d9bc28a48882e8ed2ae2c` | 775 | ALLOW_AFTER_ADAPTATION |  | Source bytes excluded; adapted destination workflow is listed in section 4. |
 | `docs/JRA_PDF_PARSER_ACCEPTANCE.md` | `9e6db9c3e6c875ccfcd2af5baf26e197e0a3ae7a` | 23308 | REWRITE_REQUIRED |  | Contains project-specific race/PDF counts and time-bound audit claims; keep out of clean-history operational export until rewritten generically. |
 | `docs/PRIVATE_MIGRATION_STRATEGY_COMPARISON.md` | `18a8d29dfabb16b349d4c585b762fee8d9dad392` | 10800 | OPTIONAL_INCLUDE |  | Refresh source SHA/PR counts and retain only if a migration decision record is wanted in the operational repo. |
 | `scripts/build_jra_pdf_audit_report.py` | `80bdf4a70af0b21c839afe3626a8774378186b70` | 7904 | ALLOW_CANDIDATE |  | Adds CLI output path/symlink protection; inputs/outputs remain explicit local paths. |

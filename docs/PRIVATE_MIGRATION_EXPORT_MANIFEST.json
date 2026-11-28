@@ -9,16 +9,16 @@
   "entries": [
     {
       "path": ".gitignore",
-      "source_git_blob_sha1": "999fd0e2cc29c17ec1c8747eafa690f06e511865",
-      "source_bytes": 340,
+      "source_git_blob_sha1": "cfd84e6eefe4f1b5493a37c89b90e15804f00b39",
+      "source_bytes": 568,
       "status": "REWRITE_REQUIRED",
       "export": false,
       "expected_sha256": null
     },
     {
       "path": ".github/workflows/research-pdf-tests.yml",
-      "source_git_blob_sha1": "702a4c332731a348afc42ceb67f6e1a9679e23db",
-      "source_bytes": 546,
+      "source_git_blob_sha1": "bb8b7911b19fdd79007d9bc28a48882e8ed2ae2c",
+      "source_bytes": 775,
       "status": "ALLOW_AFTER_ADAPTATION",
       "export": false,
       "expected_sha256": null
