@@ -28,7 +28,7 @@ The initial allowlist deliberately excludes the PDF acquisition workflow. It can
 | `README_JRA_PDF_RECOVERY.md` | Rewrite; do not copy as-is | Refers to this repository being a public fork, current source-repo state, old migration steps and the public-fork stop condition. Replace those with destination-specific instructions after migration design is approved. |
 | `.github/workflows/research-acquire-jra-pdfs.yml` | Defer | Handles source PDFs and uploads them as Actions artifacts. Only consider after Private visibility is confirmed, secret and artifact access are reviewed, and the user explicitly authorizes activation. |
 | `docs/PRIVATE_MIGRATION_PREFLIGHT_AUDIT.md` | Do not copy to operational repo | Source-specific, time-bound public exposure audit with historical repo/PR/Actions details. Retain separately as migration evidence. |
-| `docs/PRIVATE_MIGRATION_RUNBOOK.md` | Do not copy | Earlier full-mirror instructions conflict with the later clean-history decision. Keep as historical source record; do not execute it. |
+| `docs/PRIVATE_MIGRATION_RUNBOOK.md` | Retain separately; do not export to operational repo | Governance and migration-control document for the Clean-History-only design. It prohibits source history, refs, branches, tags, mirrors, and bundles; it is not an operational runtime dependency and does not authorize migration. |
 | `docs/PUBLIC_REPOSITORY_EXPOSURE_AUDIT.md` | Do not copy to operational repo | Source-specific public exposure audit. Retain separately with the old public repository evidence. |
 
 ### Explicit exclusions
@@ -120,7 +120,7 @@ The following path groups are excluded from the first clean export:
 | `.github/workflows/research-acquire-jra-pdfs.yml` | DEFER; do not bootstrap or activate until separate review and explicit authorization. |
 | `README.md`, `README_JRA_PDF_RECOVERY.md` | REWRITE; both contain source-repository-specific or legacy instructions. |
 | `docs/PRIVATE_MIGRATION_PREFLIGHT_AUDIT.md` | EXCLUDE from operational repo; retain as source audit evidence. |
-| `docs/PRIVATE_MIGRATION_RUNBOOK.md` | EXCLUDE; obsolete full-mirror procedure conflicts with this clean-history decision. |
+| `docs/PRIVATE_MIGRATION_RUNBOOK.md` | EXCLUDE from operational export; retain separately as the Clean-History-only migration-control document. It is not a runtime dependency. |
 | `docs/PUBLIC_REPOSITORY_EXPOSURE_AUDIT.md` | EXCLUDE from operational repo; retain separately as source audit evidence. |
 | Any unlisted path | EXCLUDE by default; require explicit review and a new allowlist version. |
 
@@ -133,10 +133,10 @@ Before any future export, a human operator must verify each item:
 - [ ] No `results/**`, real manifest, race mapping, PDF, extracted text, runner data, odds, prediction, database, dataset, model, log, cache, credential, or local environment file is present.
 - [ ] Every exported file has an independently computed SHA-256 recorded in the ledger.
 - [ ] Every destination file re-hashes to the recorded SHA-256.
-- [ ] Git history is newly initialized and contains no source-history objects; provenance is recorded in the first commit message or a sanitized migration record.
+- [ ] Git history is newly initialized from the reviewed staging directory and contains no source-history objects, imported source commits, source refs, branches, or tags; verify independently. Source/destination branch, tag, and reachable-commit parity are not migration requirements.
 - [ ] The destination is independently confirmed Private before any private input or secret is transferred.
 - [ ] GitHub Actions remain disabled during bootstrap; test workflow is enabled only after review.
-- [ ] No repository creation, push, secret transfer, data transfer, or workflow activation occurs without the user's separate explicit authorization.
+- [ ] No source mirror, bundle, source ref, branch, or tag is transferred; the new initial commit contains only reviewed staging files. Confirm destination identity and Private visibility before any push; keep Actions disabled. Repository creation, export, push, private-input/data transfer, secret configuration, and workflow activation each require separate explicit authorization.
 
 ## 6. Review limitations
 
