@@ -1,0 +1,159 @@
+"""Compose geometry, explicit columns, field parsing, and row validation.
+
+This is a candidate-building layer only. It never opens a PDF, guesses column
+positions, resolves horse IDs, or writes to a database.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass
+import re
+from typing import Iterable, Sequence
+
+from scripts.jra_pdf_columns import ColumnBand, split_row_into_columns
+from scripts.jra_pdf_geometry import PositionedWord, TextRow, group_words_into_rows
+from scripts.jra_pdf_runner_fields import ParsedRunnerFields, parse_runner_cells
+from scripts.jra_pdf_runner_validation import (
+    RunnerCandidate,
+    validate_runner_candidates,
+)
+
+
+class RaceExtractionError(ValueError):
+    """Raised when a race cannot be safely converted into runner candidates."""
+
+
+@dataclass(frozen=True)
+class RunnerExtraction:
+    fields: ParsedRunnerFields
+    candidate: RunnerCandidate
+
+
+def build_race_candidates(
+    rows: Sequence[TextRow],
+    column_bands: Iterable[ColumnBand],
+    *,
+    race_id: str,
+    declared_field_size: int,
+    source_pdf_sha256: str,
+    source_page_index: int,
+) -> list[RunnerExtraction]:
+    """Build and validate one race from already-grouped, already-located rows.
+
+    The caller must remove non-runner headers/footers only through a separately
+    reviewed row-selection rule. This function deliberately fails on any row
+    that cannot be parsed; it never silently skips a row.
+    """
+    if not re.fullmatch(r"20\d{10}", race_id):
+        raise RaceExtractionError("race_id must be a 12-digit target ID")
+    if not re.fullmatch(r"[0-9a-fA-F]{64}", source_pdf_sha256):
+        raise RaceExtractionError("source_pdf_sha256 must be a SHA-256 hex digest")
+    if not isinstance(source_page_index, int) or isinstance(source_page_index, bool) or source_page_index < 0:
+        raise RaceExtractionError("source_page_index must be a non-negative integer")
+    if not rows:
+        raise RaceExtractionError("no runner rows supplied")
+
+    bands = list(column_bands)
+    if not bands:
+        raise RaceExtractionError("at least one explicit column band is required")
+
+    extracted: list[RunnerExtraction] = []
+    candidates: list[RunnerCandidate] = []
+    for index, row in enumerate(rows):
+        try:
+            cells = split_row_into_columns(row, bands, reject_unassigned=True)
+            fields = parse_runner_cells(cells)
+        except (ValueError, TypeError) as exc:
+            raise RaceExtractionError(f"runner row {index} could not be parsed: {exc}") from exc
+
+        candidate = RunnerCandidate(
+            race_id=race_id,
+            horse_no=fields.horse_no,
+            horse_name=fields.horse_name,
+            raw_row_text=row.text,
+            source_pdf_sha256=source_pdf_sha256.lower(),
+            source_page_index=source_page_index,
+            finish_raw=fields.finish_raw or "",
+            finish_rank=fields.finish_rank,
+            result_status=fields.result_status,
+            horse_id=None,
+        )
+        extracted.append(RunnerExtraction(fields=fields, candidate=candidate))
+        candidates.append(candidate)
+
+    try:
+        validated = validate_runner_candidates(
+            candidates,
+            race_id=race_id,
+            declared_field_size=declared_field_size,
+        )
+    except ValueError as exc:
+        raise RaceExtractionError(f"race candidate validation failed: {exc}") from exc
+
+    by_horse_no = {item.candidate.horse_no: item for item in extracted}
+    return [by_horse_no[row.horse_no] for row in validated]
+
+
+def group_page_words(
+    words: Iterable[PositionedWord],
+    *,
+    baseline_tolerance: float = 2.5,
+) -> list[TextRow]:
+    """Convenience wrapper for coordinate grouping; no semantic row filtering."""
+    return group_words_into_rows(words, baseline_tolerance=baseline_tolerance)
+
+
+@dataclass(frozen=True)
+class RunnerRowBand:
+    """Operator-reviewed vertical interval expected to contain one runner row."""
+    y_min: float
+    y_max: float
+
+
+def select_runner_rows_from_page_words(
+    words: Iterable[PositionedWord],
+    row_bands: Sequence[RunnerRowBand],
+    *,
+    baseline_tolerance: float = 2.5,
+) -> list[TextRow]:
+    """Select rows only inside explicitly reviewed vertical intervals.
+
+    This intentionally does not auto-detect runner rows. Every configured
+    interval must contain exactly one geometric text row, and every supplied
+    non-empty word must belong to exactly one interval. Headers/footers should
+    be excluded by the caller's explicit page-region selection, not heuristics.
+    """
+    if not row_bands:
+        raise RaceExtractionError("at least one reviewed runner row band is required")
+    ordered = sorted(row_bands, key=lambda band: band.y_min)
+    previous_max = None
+    for band in ordered:
+        if band.y_max <= band.y_min:
+            raise RaceExtractionError("runner row band has invalid vertical bounds")
+        if previous_max is not None and band.y_min < previous_max:
+            raise RaceExtractionError("runner row bands overlap")
+        previous_max = band.y_max
+
+    buckets: list[list[PositionedWord]] = [[] for _ in ordered]
+    for word in words:
+        center = word.center_y
+        matches = [
+            index for index, band in enumerate(ordered)
+            if band.y_min <= center < band.y_max
+        ]
+        if len(matches) != 1:
+            raise RaceExtractionError(
+                f"word at y={center:.2f} is outside exactly one reviewed runner row band"
+            )
+        buckets[matches[0]].append(word)
+
+    selected: list[TextRow] = []
+    for index, bucket in enumerate(buckets):
+        if not bucket:
+            raise RaceExtractionError(f"reviewed runner row band {index} is empty")
+        grouped = group_words_into_rows(bucket, baseline_tolerance=baseline_tolerance)
+        if len(grouped) != 1:
+            raise RaceExtractionError(
+                f"reviewed runner row band {index} contains {len(grouped)} text rows; expected exactly one"
+            )
+        selected.append(grouped[0])
+    return selected

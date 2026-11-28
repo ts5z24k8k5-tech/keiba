@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "source": {
+    "repository": "ts5z24k8k5-tech/keiba",
+    "ref": "research/jra-pdf-acquisition-20261123",
+    "commit": "33ff31300b95f38c3da671f53a26816e8996568c"
+  },
+  "policy": "Exact-path clean-history export; only entries with export=true are permitted. SHA-256 must be populated from trusted exported bytes before validation.",
+  "entries": [
+    {
+      "path": ".gitignore",
+      "source_git_blob_sha1": "cfd84e6eefe4f1b5493a37c89b90e15804f00b39",
+      "source_bytes": 568,
+      "status": "REWRITE_REQUIRED",
+      "export": false,
+      "expected_sha256": null
+    },
+    {
+      "path": ".github/workflows/research-pdf-tests.yml",
+      "source_git_blob_sha1": "bb8b7911b19fdd79007d9bc28a48882e8ed2ae2c",
+      "source_bytes": 775,
+      "status": "ALLOW_AFTER_ADAPTATION",
+      "export": false,
+      "expected_sha256": null
+    },
+    {
+      "path": "docs/JRA_PDF_PARSER_ACCEPTANCE.md",
+      "source_git_blob_sha1": "9e6db9c3e6c875ccfcd2af5baf26e197e0a3ae7a",
+      "source_bytes": 23308,
+      "status": "REWRITE_REQUIRED",
+      "export": false,
+      "expected_sha256": null
+    },
+    {
+      "path": "docs/PRIVATE_MIGRATION_STRATEGY_COMPARISON.md",
+      "source_git_blob_sha1": "18a8d29dfabb16b349d4c585b762fee8d9dad392",
+      "source_bytes": 10800,
+      "status": "OPTIONAL_INCLUDE",
+      "export": false,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/build_jra_pdf_audit_report.py",
+      "source_git_blob_sha1": "80bdf4a70af0b21c839afe3626a8774378186b70",
+      "source_bytes": 7904,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/build_jra_pdf_batch_report.py",
+      "source_git_blob_sha1": "c2b420a1c1fc6c8f5cdbbd6ad629cbac524e8bf8",
+      "source_bytes": 3374,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/build_jra_pdf_integrated_progress.py",
+      "source_git_blob_sha1": "beb14524363935f016df37eaef645392e20365a7",
+      "source_bytes": 1513,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/build_jra_pdf_progress_report.py",
+      "source_git_blob_sha1": "c641f29267ee6a684a3cb0b2993970d80458c292",
+      "source_bytes": 3441,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/download_jra_pdfs.py",
+      "source_git_blob_sha1": "1283f8077d87a3307a9709ebe0b651165c649ef4",
+      "source_bytes": 13087,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/inspect_jra_pdf_layout.py",
+      "source_git_blob_sha1": "72d32d17a2e257691fd0b23c156f0aa6a90b3c2b",
+      "source_bytes": 3415,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/jra_pdf_batch_progress.py",
+      "source_git_blob_sha1": "22f1e3b9150c6b2ad7509dac5d6b4d4d3bc32683",
+      "source_bytes": 5950,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/jra_pdf_columns.py",
+      "source_git_blob_sha1": "88c938d46ac8ff088a45f32c4562dc9f0f622930",
+      "source_bytes": 2892,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/jra_pdf_geometry.py",
+      "source_git_blob_sha1": "78192659b40d4aed7f1e900009a3b2c3f12104c8",
+      "source_bytes": 3374,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/jra_pdf_mapping_audit.py",
+      "source_git_blob_sha1": "638834bf7243489302a1f251e3708f341c1bb67c",
+      "source_bytes": 10196,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/jra_pdf_progress.py",
+      "source_git_blob_sha1": "a706620e5ecb209812fa822bb33a5653a562967e",
+      "source_bytes": 4682,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/jra_pdf_progress_integration.py",
+      "source_git_blob_sha1": "589e9b0881a1802e8b4022d0922095f3768a590d",
+      "source_bytes": 5765,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/jra_pdf_race_audit.py",
+      "source_git_blob_sha1": "b41dbe7ea8073fbc310331a3bc84950bc005a7ab",
+      "source_bytes": 7187,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/jra_pdf_race_pipeline.py",
+      "source_git_blob_sha1": "8e3fe4c8d7de1bccd60d4729bb48605a8de19b71",
+      "source_bytes": 6054,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/jra_pdf_reconciliation.py",
+      "source_git_blob_sha1": "0745261f5800d65cb66ed83276798fa8f7efc118",
+      "source_bytes": 3389,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/jra_pdf_runner_fields.py",
+      "source_git_blob_sha1": "789fc13b05200d52190804cff10a5f9b730235a7",
+      "source_bytes": 6109,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/jra_pdf_runner_validation.py",
+      "source_git_blob_sha1": "14a809ee11adaca83dd80bd0844904374c9a8369",
+      "source_bytes": 3809,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "scripts/segment_jra_pdf_text.py",
+      "source_git_blob_sha1": "98c55f6ed1f768dcc48eaa34bbbbff86adba29a8",
+      "source_bytes": 5058,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_build_jra_pdf_audit_report.py",
+      "source_git_blob_sha1": "a7f0be1982bc239474dc479845faffe552d4af37",
+      "source_bytes": 5060,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_build_jra_pdf_batch_report.py",
+      "source_git_blob_sha1": "de81f9db11fafdf942eb914d47b6307672863c61",
+      "source_bytes": 1996,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_build_jra_pdf_progress_report.py",
+      "source_git_blob_sha1": "36908c216828e6da63f0ae260ebf9de926db3c30",
+      "source_bytes": 1997,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_download_jra_pdfs.py",
+      "source_git_blob_sha1": "b37e4bb8df01a56841f93d5cf31832629daab07c",
+      "source_bytes": 7150,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_inspect_jra_pdf_layout.py",
+      "source_git_blob_sha1": "cb7dcac04271566c09cefb38501f099b5887ccfa",
+      "source_bytes": 2728,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_batch_progress.py",
+      "source_git_blob_sha1": "475c797a25c729add711ccca747db385601607e8",
+      "source_bytes": 3903,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_columns.py",
+      "source_git_blob_sha1": "c7f03490a1e258c2c1259ceed98573638fa2e539",
+      "source_bytes": 2959,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_geometry.py",
+      "source_git_blob_sha1": "288cb72d8fa7d2cac14b9c1b651b1b7c5be58940",
+      "source_bytes": 2702,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_mapping_audit.py",
+      "source_git_blob_sha1": "96dd5e4dfbf3af272c1a41402c400c389b3af6b1",
+      "source_bytes": 6020,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_progress.py",
+      "source_git_blob_sha1": "f3c8f24aa2be388746dc67031a5731ef63c21cf5",
+      "source_bytes": 2707,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_progress_integration.py",
+      "source_git_blob_sha1": "981af98f09a26198c8973251fbf0a3035ffcb21b",
+      "source_bytes": 4863,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_race_audit.py",
+      "source_git_blob_sha1": "7a798279f3ad43757739e4bcb1326bce8bd0748b",
+      "source_bytes": 3883,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_race_pipeline.py",
+      "source_git_blob_sha1": "75a8bee1dd3c1443b40b9e8c5193ac3a72197082",
+      "source_bytes": 3465,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_reconciliation.py",
+      "source_git_blob_sha1": "73019af70181017c80ab1a9bd65d6ceecfa9fbc7",
+      "source_bytes": 2467,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_resume.py",
+      "source_git_blob_sha1": "579a505deec0b3be988870e51fca5d3701fe8605",
+      "source_bytes": 4050,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_runner_fields.py",
+      "source_git_blob_sha1": "067f9964072b521f9520bfe6fd4e337d319a979f",
+      "source_bytes": 3468,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_runner_validation.py",
+      "source_git_blob_sha1": "314ce9f2a29ca1b9f91252c78e8ab914df663fd8",
+      "source_bytes": 3287,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_jra_pdf_workflow_security.py",
+      "source_git_blob_sha1": "ecf621899349190f59b0a1e8ee439d7c4a9f41f5",
+      "source_bytes": 3225,
+      "status": "REWRITE_REQUIRED",
+      "export": false,
+      "expected_sha256": null
+    },
+    {
+      "path": "tests/test_segment_jra_pdf_text.py",
+      "source_git_blob_sha1": "40a819b4836b89b901449c1b6863fe1195dffbca",
+      "source_bytes": 3152,
+      "status": "ALLOW_CANDIDATE",
+      "export": true,
+      "expected_sha256": null
+    }
+  ]
+}

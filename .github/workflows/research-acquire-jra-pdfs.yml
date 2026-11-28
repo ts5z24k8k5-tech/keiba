@@ -1,0 +1,61 @@
+name: Research - acquire official JRA PDFs
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out research branch
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Require private repository before handling PDFs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          visibility="$(gh api "repos/${GITHUB_REPOSITORY}" --jq .visibility)"
+          if [ "$visibility" != "private" ]; then
+            echo "::error::This workflow handles source PDFs and must not publish artifacts from a public repository. Use a private standalone repository before running this workflow."
+            exit 1
+          fi
+      - name: Restore private manifest from Actions secret
+        env:
+          MANIFEST_B64: ${{ secrets.JRA_PDF_MANIFEST_B64 }}
+        run: |
+          test -n "$MANIFEST_B64" || { echo "Missing JRA_PDF_MANIFEST_B64 secret"; exit 2; }
+          mkdir -p private_input
+          printf '%s' "$MANIFEST_B64" | base64 --decode > private_input/jra_official_pdf_manifest_23.csv
+      - name: Run downloader unit tests
+        run: python -m unittest discover -s tests -p 'test_download_jra_pdfs.py' -v
+      - name: Install local PDF inspection dependency
+        run: python -m pip install --disable-pip-version-check pymupdf
+      - name: Validate and download official PDFs
+        run: |
+          python scripts/download_jra_pdfs.py \
+            --manifest private_input/jra_official_pdf_manifest_23.csv \
+            --out output/jra_pdfs \
+            --expected-races 149 --expected-pdfs 23 \
+            --timeout 30 --retries 3 --delay 1.5
+      - name: Inspect acquired PDF layout (aggregate metrics only)
+        if: success()
+        run: python scripts/inspect_jra_pdf_layout.py --pdf-dir output/jra_pdfs --out output/jra_pdfs/layout_audit.json
+      - name: Publish acquisition artifact only
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jra-official-pdfs-acquisition
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            output/jra_pdfs/*.pdf
+            output/jra_pdfs/download_audit.csv
+            output/jra_pdfs/download_summary.json
+            output/jra_pdfs/layout_audit.json

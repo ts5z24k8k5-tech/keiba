@@ -1,0 +1,49 @@
+# Private inputs and generated outputs (never commit real race data)
+private_input/
+private-input/
+private_output/
+private-output/
+output/
+outputs/
+data/
+datasets/
+snapshots/
+models/
+logs/
+cache/
+
+# Downloaded source PDFs and extracted artifacts
+*.pdf
+*.pdf.part
+*.csv
+*.sqlite
+*.sqlite3
+*.db
+*.parquet
+*.pkl
+*.joblib
+*.onnx
+*.pt
+*.pth
+*.h5
+
+# Local credentials and key material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+.netrc
+.git-credentials
+
+# Python build/runtime artifacts
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/

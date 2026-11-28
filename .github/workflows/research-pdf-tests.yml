@@ -1,0 +1,30 @@
+name: Research PDF utility tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install pinned runtime dependency
+        run: python -m pip install -r requirements.txt
+      - name: Verify PDF backend
+        run: python -c "import pymupdf; print('PyMuPDF import OK')"
+      - name: Run synthetic unit tests
+        run: python -m unittest discover -s tests -p 'test_*jra_pdf*.py' -v
